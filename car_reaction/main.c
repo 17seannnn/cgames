@@ -148,9 +148,13 @@ int main()
                 show_road(m, c.score);
                 switch (key) {
                 case KEY_LEFT:
+                case 'A':
+                case 'a':
                         move_car(&c, -1);
                         break;
                 case KEY_RIGHT:
+                case 'D':
+                case 'd':
                         move_car(&c, 1);
                         break;
                 case KEY_RESIZE:
