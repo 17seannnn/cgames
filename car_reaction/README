@@ -1,0 +1,11 @@
+Car Reaction
+
+TODO
+
+[] - different keys for move
+[] - handle_resize()
+[] - use length for barriers
+[] - count score and save it in file
+[] - add max score and stop game
+[] - add config file for road
+[] - refactor
