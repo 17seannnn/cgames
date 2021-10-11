@@ -2,7 +2,7 @@ Car Reaction
 
 TODO
 
-[] - handle_resize()
+[] - decide what i`ll do with min row and min col
 [] - add barriers
 [] - use length for barriers
 [] - count score and save it in file

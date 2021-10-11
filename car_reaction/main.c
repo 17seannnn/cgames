@@ -34,8 +34,7 @@ int check_screen()
         getmaxyx(stdscr, row, col);
         if (row < min_row || col < min_col)
                 return 0;
-        else
-                return 1;
+        return 1;
 }
 
 void init_map(struct map *m)
@@ -64,11 +63,6 @@ void init_game(struct map *m, struct car *c, struct barrier *b)
         init_map(m);
         init_car(c, start_pos, 0, *m);
         /* init_barrier(b) */
-}
-
-void handle_resize(struct map *m, struct car *c, struct barrier *b)
-{
-
 }
 
 void show_map(struct map m)
@@ -130,6 +124,14 @@ void draw_screen(struct map m, struct car c, struct barrier *b)
         show_road(m, c.score);
         show_car(c);
         /* show_barrier(b); */
+}
+
+void handle_resize(struct map *m, struct car *c, struct barrier *b)
+{
+        init_map(m);
+        init_car(c, c->pos, c->score, *m);
+        /* init_barrier(b) */
+        draw_screen(*m, *c, b);
 }
 
 int main()
