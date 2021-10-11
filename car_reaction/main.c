@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <curses.h>
-#include <unistd.h>
 
 enum {
-        key_escape     = 27,
         min_row        = 24,
         min_col        = 80,
-        delay_duration = 100,
+        key_escape     = 27,
+        delay_duration = 150,
         car_symbol     = 'I',
+        start_pos      = 2,
         min_pos        = 1,
         max_pos        = 4,
         road_height    = 16,
@@ -16,7 +16,7 @@ enum {
 };
 
 struct map {
-        int min_x, max_x, min_y, max_y;
+        int min_x, max_x, min_y, max_y, h, w;
 };
 
 struct car {
@@ -38,21 +38,32 @@ int check_screen()
                 return 1;
 }
 
+void init_map(struct map *m)
+{
+        int row, col;
+        getmaxyx(stdscr, row, col);
+        m->w = (road_width * max_pos) + (max_pos - 1) + 2;
+        m->h = road_height;
+        m->min_x = (col - m->w) / 2;
+        m->max_x = m->min_x + m->w - 1;
+        m->min_y = (row - m->h) / 2;
+        m->max_y = m->min_y + m->h - 1;
+}
+
+void init_car(struct car *c, int pos, int score, struct map m)
+{
+        c->cur_x = m.min_x + road_width * pos + pos-1 - road_width/2;
+        c->cur_y = m.max_y - m.h/5;
+        c->pos = pos;
+        c->score = score;
+        c->symb = car_symbol;
+}
+
 void init_game(struct map *m, struct car *c, struct barrier *b)
 {
-        int row, col, map_h, map_w;
-        getmaxyx(stdscr, row, col);
-        map_w = (road_width * max_pos) + (max_pos - 1) + 2;
-        map_h = road_height;
-        m->min_x = (col - map_w) / 2;
-        m->max_x = m->min_x + map_w - 1;
-        m->min_y = (row - map_h) / 2;
-        m->max_y = m->min_y + map_h - 1;
-        c->pos = 2;
-        c->cur_x = m->min_x + road_width * c->pos + c->pos-1 - road_width/2;
-        c->cur_y = m->max_y - map_h/5;
-        c->score = 0;
-        c->symb = car_symbol;
+        init_map(m);
+        init_car(c, start_pos, 0, *m);
+        /* init_barrier(b) */
 }
 
 void handle_resize(struct map *m, struct car *c, struct barrier *b)

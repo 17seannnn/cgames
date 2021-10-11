@@ -3,6 +3,7 @@ Car Reaction
 TODO
 
 [] - handle_resize()
+[] - add barriers
 [] - use length for barriers
 [] - count score and save it in file
 [] - add max score and stop game
