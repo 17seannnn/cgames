@@ -7,6 +7,7 @@ enum {
         key_escape     = 27,
         delay_duration = 150,
         car_symbol     = 'I',
+        barrier_symbol = '=',
         start_pos      = 2,
         min_pos        = 1,
         max_pos        = 4,
@@ -21,7 +22,6 @@ struct map {
 
 struct car {
         int cur_x, cur_y, pos, score;
-        char symb;
 };
 
 struct barrier {
@@ -55,7 +55,6 @@ void init_car(struct car *c, int pos, int score, struct map m)
         c->cur_y = m.max_y - m.h/5;
         c->pos = pos;
         c->score = score;
-        c->symb = car_symbol;
 }
 
 void init_game(struct map *m, struct car *c, struct barrier *b)
@@ -90,7 +89,7 @@ void show_road(struct map m, int score)
 
 void show_car(struct car c)
 {
-        mvaddch(c.cur_y, c.cur_x, c.symb);
+        mvaddch(c.cur_y, c.cur_x, car_symbol);
         refresh();
 }
 
