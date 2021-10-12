@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <curses.h>
 
 enum {
@@ -13,7 +14,8 @@ enum {
         max_pos        = 4,
         road_height    = 16,
         road_width     = 11,
-        barrier_count  = max_pos
+        barrier_count  = max_pos,
+        barrier_width  = road_width
 };
 
 struct map {
@@ -25,7 +27,7 @@ struct car {
 };
 
 struct barrier {
-        int cur_x, cur_y, length;
+        int cur_x, cur_y, height, step;
 };
 
 int check_screen()
@@ -57,11 +59,27 @@ void init_car(struct car *c, int pos, int score, struct map m)
         c->score = score;
 }
 
+void init_barrier(struct barrier *b, int n, int save, struct map m)
+{
+        int i;
+        for (i = 0; i < n; i++) {
+                if (save) {
+                        b[i].cur_x = m.min_x+1 + road_width*i;
+                        b[i].cur_y = m.min_y + b[i].step;
+                } else {
+                        b[i].cur_x = m.min_x+1 + road_width*i;
+                        b[i].cur_y = m.min_y - rand() % 10;
+                        b[i].height = 1;
+                        b[i].step = b[i].cur_y - m.min_y;
+                }
+        }
+}
+
 void init_game(struct map *m, struct car *c, struct barrier *b)
 {
         init_map(m);
         init_car(c, start_pos, 0, *m);
-        /* init_barrier(b) */
+        init_barrier(b, barrier_count, 0, *m);
 }
 
 void show_map(struct map m)
@@ -129,7 +147,7 @@ void handle_resize(struct map *m, struct car *c, struct barrier *b)
 {
         init_map(m);
         init_car(c, c->pos, c->score, *m);
-        /* init_barrier(b) */
+        init_barrier(b, barrier_count, 0, *m);
         draw_screen(*m, *c, b);
 }
 

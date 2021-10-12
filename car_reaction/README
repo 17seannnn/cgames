@@ -2,10 +2,11 @@ Car Reaction
 
 TODO
 
-[] - decide what i`ll do with min row and min col
 [] - add barriers
+[] - decide what i`ll do with min row and min col
 [] - use length for barriers
 [] - count score and save it in file
 [] - add max score and stop game
 [] - add config file for road
 [] - refactor
+[] - add opts help and version
