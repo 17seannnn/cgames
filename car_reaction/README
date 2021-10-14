@@ -2,12 +2,11 @@ Car Reaction
 
 TODO
 
-[x] - add func for mvprintw() score
-[ ] - decide what i`ll do with min row and min col
-[ ] - add max score and stop game
-[ ] - count score and save it in file
+[x] - add max score and stop game
+[ ] - save score in file
 [ ] - speed up game
 [ ] - colors
+[ ] - decide what i`ll do with min row and min col
 [ ] - add opts help and version
 [ ] - refactor
 [ ] - add config file for road

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <curses.h>
 #include <time.h>
 
@@ -16,7 +17,8 @@ enum {
         road_height        = 16,
         road_width         = 11,
         barrier_count      = max_pos,
-        barrier_width      = road_width
+        barrier_width      = road_width,
+        max_score          = 100
 };
 
 struct map {
@@ -237,6 +239,23 @@ void handle_resize(struct map *m, struct car *c, struct barrier *b, int n)
         draw_screen(*m, *c, b, n);
 }
 
+void endgame(int score)
+{
+        int x, y;
+        getmaxyx(stdscr, y, x);
+        sleep(1);
+        clear();
+        if (score < max_score)
+                show_score(score, y/2, (x-5)/2);
+        else
+                mvprintw(y/2, (x-10)/2, "You win!");
+        mvprintw(y-1, 0, "Press any key to exit");
+        refresh();
+        sleep(1);
+        timeout(-1);
+        getch();
+}
+
 int main()
 {
         int res, key;
@@ -277,15 +296,16 @@ int main()
                         handle_resize(&m, &c, b, barrier_count);
                         break;
                 }
+                c.score++;
                 show_road(m, c.score);
                 res = check_collision(c, b, barrier_count);
-                if (res) {
-                        /* endgame(c.score); */
+                if (res)
                         break;
-                }
+                if (c.score >= max_score)
+                        break;
                 move_barrier(b, barrier_count, m);
-                c.score++;
         }
+        endgame(c.score);
         endwin();
         return 0;
 }
