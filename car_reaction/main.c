@@ -16,8 +16,7 @@ enum {
         road_height        = 16,
         road_width         = 11,
         barrier_count      = max_pos,
-        barrier_width      = road_width,
-        max_barrier_height = 1
+        barrier_width      = road_width
 };
 
 struct map {
@@ -29,7 +28,7 @@ struct car {
 };
 
 struct barrier {
-        int cur_x, cur_y, height, step;
+        int cur_x, cur_y, step;
 };
 
 int rrand(int max)
@@ -94,7 +93,6 @@ void init_barrier(struct barrier *b, int n, int save, struct map m)
                 b->cur_x = m.min_x+1 + road_width*n + n;
                 b->step = rrand(-10);
                 b->cur_y = m.min_y + b->step;
-                b->height = rrand(max_barrier_height) + 1;
         }
 }
 
@@ -162,14 +160,12 @@ void move_car(struct car *c, int dpos)
 
 void show_barrier(struct barrier *b, int n)
 {
-        int i, j, k;
+        int i, j;
         for (i = 0; i < n; i++) {
-                for (j = 0; j < b[i].height; j++) {
-                        if (b[i].step - j >= 0) {
-                                move(b[i].cur_y - j, b[i].cur_x);
-                                for (k = 0; k < road_width; k++)
-                                        addch('=');
-                        }
+                if (b[i].step >= 0) {
+                        move(b[i].cur_y, b[i].cur_x);
+                        for (j = 0; j < road_width; j++)
+                                addch('=');
                 }
         }
         refresh();
@@ -177,14 +173,12 @@ void show_barrier(struct barrier *b, int n)
 
 void hide_barrier(struct barrier *b, int n)
 {
-        int i, j, k;
+        int i, j;
         for (i = 0; i < n; i++) {
-                for (j = 0; j < b[i].height; j++) {
-                        if (b[i].step - j >= 0) {
-                                move(b[i].cur_y - j, b[i].cur_x);
-                                for (k = 0; k < road_width; k++)
-                                        addch(' ');
-                        }
+                if (b[i].step >= 0) {
+                        move(b[i].cur_y, b[i].cur_x);
+                        for (j = 0; j < road_width; j++)
+                                addch(' ');
                 }
         }
         refresh();
@@ -208,14 +202,13 @@ void move_barrier(struct barrier *b, int n, struct map m)
 
 int check_collision(struct car c, struct barrier *b, int n)
 {
-        int i, j;
+        int i;
         for (i = 0; i < n; i++)
-                for (j = 0; j < b[i].height; j++)
-                        if ((c.cur_y   == b[i].cur_y - j ||
-                             c.cur_y-1 == b[i].cur_y - j) &&
-                            c.cur_x > b[i].cur_x &&
-                            c.cur_x < b[i].cur_x + road_width)
-                                        return 1;
+                if ((c.cur_y   == b[i].cur_y ||
+                     c.cur_y-1 == b[i].cur_y) &&
+                    (c.cur_x > b[i].cur_x &&
+                     c.cur_x < b[i].cur_x + road_width))
+                                return 1;
         return 0;
 }
 
