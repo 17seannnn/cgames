@@ -2,8 +2,7 @@ Car Reaction
 
 TODO
 
-[x] -use barrier_count everywhere like a variable
-[ ] - add func for mvprintw() score
+[x] - add func for mvprintw() score
 [ ] - decide what i`ll do with min row and min col
 [ ] - add max score and stop game
 [ ] - count score and save it in file

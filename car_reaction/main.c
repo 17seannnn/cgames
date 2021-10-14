@@ -116,6 +116,11 @@ void show_map(struct map m)
         refresh();
 }
 
+void show_score(int score)
+{
+        mvprintw(0, 0, "%d", score);
+}
+
 void show_road(struct map m, int score)
 {
         int x, y, pos;
@@ -256,7 +261,7 @@ int main()
         init_game(&m, &c, b, barrier_count);
         draw_screen(m, c, b, barrier_count);
         while ((key = getch()) != key_escape) {
-                mvprintw(0, 0, "%d", c.score);
+                show_score(c.score);
                 switch (key) {
                 case KEY_LEFT:
                 case 'A':
