@@ -1,21 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <curses.h>
+#include <time.h>
 
 enum {
-        min_row        = 24,
-        min_col        = 80,
-        key_escape     = 27,
-        delay_duration = 150,
-        car_symbol     = 'I',
-        barrier_symbol = '=',
-        start_pos      = 2,
-        min_pos        = 1,
-        max_pos        = 4,
-        road_height    = 16,
-        road_width     = 11,
-        barrier_count  = max_pos,
-        barrier_width  = road_width
+        min_row            = 24,
+        min_col            = 80,
+        key_escape         = 27,
+        delay_duration     = 50,
+        car_symbol         = 'I',
+        barrier_symbol     = '=',
+        start_pos          = 2,
+        min_pos            = 1,
+        max_pos            = 2,
+        road_height        = 16,
+        road_width         = 11,
+        barrier_count      = max_pos,
+        barrier_width      = road_width,
+        max_barrier_height = 1
 };
 
 struct map {
@@ -29,6 +31,11 @@ struct car {
 struct barrier {
         int cur_x, cur_y, height, step;
 };
+
+int rrand(int max)
+{
+        return (int)((double)max*rand()/(RAND_MAX+1.0));
+}
 
 int check_screen()
 {
@@ -59,27 +66,46 @@ void init_car(struct car *c, int pos, int score, struct map m)
         c->score = score;
 }
 
-void init_barrier(struct barrier *b, int n, int save, struct map m)
+void check_barrier(struct barrier *b, int n)
 {
         int i;
         for (i = 0; i < n; i++) {
-                if (save) {
-                        b[i].cur_x = m.min_x+1 + road_width*i;
-                        b[i].cur_y = m.min_y + b[i].step;
-                } else {
-                        b[i].cur_x = m.min_x+1 + road_width*i;
-                        b[i].cur_y = m.min_y - rand() % 10;
-                        b[i].height = 1;
-                        b[i].step = b[i].cur_y - m.min_y;
-                }
+                if (i > 0)
+                        if (b[i].cur_y   != b[i-1].cur_y &&
+                            b[i].cur_y-1 != b[i-1].cur_y &&
+                            b[i].cur_y+1 != b[i-1].cur_y)
+                                return;
+                if (i+1 != n)
+                        if (b[i].cur_y   != b[i+1].cur_y &&
+                            b[i].cur_y-1 != b[i+1].cur_y &&
+                            b[i].cur_y+1 != b[i+1].cur_y)
+                                return;
+        }
+        b[0].cur_y -= 3;
+        b[0].step -= 3;
+}
+
+void init_barrier(struct barrier *b, int n, int save, struct map m)
+{
+        if (save) {
+                b->cur_x = m.min_x+1 + road_width*n;
+                b->cur_y = m.min_y + b->step;
+        } else {
+                b->cur_x = m.min_x+1 + road_width*n + n;
+                b->step = rrand(-10);
+                b->cur_y = m.min_y + b->step;
+                b->height = rrand(max_barrier_height) + 1;
         }
 }
 
 void init_game(struct map *m, struct car *c, struct barrier *b)
 {
+        int i;
         init_map(m);
         init_car(c, start_pos, 0, *m);
-        init_barrier(b, barrier_count, 0, *m);
+        for (i = 0; i < barrier_count; i++)
+                init_barrier(&b[i], i, 0, *m);
+        check_barrier(b, barrier_count);
 }
 
 void show_map(struct map m)
@@ -134,26 +160,88 @@ void move_car(struct car *c, int dpos)
         show_car(*c);
 }
 
+void show_barrier(struct barrier *b, int n)
+{
+        int i, j, k;
+        for (i = 0; i < n; i++) {
+                for (j = 0; j < b[i].height; j++) {
+                        if (b[i].step - j >= 0) {
+                                move(b[i].cur_y - j, b[i].cur_x);
+                                for (k = 0; k < road_width; k++)
+                                        addch('=');
+                        }
+                }
+        }
+        refresh();
+}
+
+void hide_barrier(struct barrier *b, int n)
+{
+        int i, j, k;
+        for (i = 0; i < n; i++) {
+                for (j = 0; j < b[i].height; j++) {
+                        if (b[i].step - j >= 0) {
+                                move(b[i].cur_y - j, b[i].cur_x);
+                                for (k = 0; k < road_width; k++)
+                                        addch(' ');
+                        }
+                }
+        }
+        refresh();
+}
+
+void move_barrier(struct barrier *b, int n, struct map m)
+{
+        int i;
+        hide_barrier(b, n);
+        for (i = 0; i < n; i++) {
+                if (b[i].step < road_height) {
+                        b[i].cur_y++;
+                        b[i].step++;
+                } else {
+                        init_barrier(&b[i], i, 0, m);
+                }
+        }
+        check_barrier(b, barrier_count);
+        show_barrier(b, n);
+}
+
+int check_collision(struct car c, struct barrier *b, int n)
+{
+        int i, j;
+        for (i = 0; i < n; i++)
+                for (j = 0; j < b[i].height; j++)
+                        if ((c.cur_y   == b[i].cur_y - j ||
+                             c.cur_y-1 == b[i].cur_y - j) &&
+                            c.cur_x > b[i].cur_x &&
+                            c.cur_x < b[i].cur_x + road_width)
+                                        return 1;
+        return 0;
+}
+
 void draw_screen(struct map m, struct car c, struct barrier *b)
 {
         clear();
         show_map(m);
         show_road(m, c.score);
         show_car(c);
-        /* show_barrier(b); */
+        show_barrier(b, barrier_count);
 }
 
 void handle_resize(struct map *m, struct car *c, struct barrier *b)
 {
+        int i;
         init_map(m);
         init_car(c, c->pos, c->score, *m);
-        init_barrier(b, barrier_count, 0, *m);
+        for (i = 0; i < barrier_count; i++)
+                init_barrier(&b[i], i, 0, *m);
+        check_barrier(b, barrier_count);
         draw_screen(*m, *c, b);
 }
 
 int main()
 {
-        int key;
+        int res, key;
         struct map m;
         struct car c;
         struct barrier b[barrier_count];
@@ -165,6 +253,7 @@ int main()
         curs_set(0);
         keypad(stdscr, 1);
         timeout(delay_duration);
+        srand(time(NULL));
         if (!check_screen()) {
                 endwin();
                 fprintf(stderr, "Resize your window to %dx%d\n",
@@ -175,7 +264,6 @@ int main()
         draw_screen(m, c, b);
         while ((key = getch()) != key_escape) {
                 mvprintw(0, 0, "%d", c.score);
-                show_road(m, c.score);
                 switch (key) {
                 case KEY_LEFT:
                 case 'A':
@@ -191,6 +279,13 @@ int main()
                         handle_resize(&m, &c, b);
                         break;
                 }
+                show_road(m, c.score);
+                res = check_collision(c, b, barrier_count);
+                if (res) {
+                        /* endgame(c.score); */
+                        break;
+                }
+                move_barrier(b, barrier_count, m);
                 c.score++;
         }
         endwin();

@@ -2,11 +2,18 @@ Car Reaction
 
 TODO
 
-[] - add barriers
+[] - leave empty space between barriers
+
+[] - remove barrier height from code
+
+[] - use barrier_count everywhere like a variable
+[] - add func for mvprintw() score
 [] - decide what i`ll do with min row and min col
-[] - use length for barriers
-[] - count score and save it in file
 [] - add max score and stop game
-[] - add config file for road
-[] - refactor
+[] - count score and save it in file
+[] - speed up game
+
+[] - colors
 [] - add opts help and version
+[] - refactor
+[] - add config file for road
