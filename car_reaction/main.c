@@ -12,7 +12,7 @@ enum {
         barrier_symbol     = '=',
         start_pos          = 2,
         min_pos            = 1,
-        max_pos            = 2,
+        max_pos            = 3,
         road_height        = 16,
         road_width         = 11,
         barrier_count      = max_pos,
@@ -96,14 +96,14 @@ void init_barrier(struct barrier *b, int n, int save, struct map m)
         }
 }
 
-void init_game(struct map *m, struct car *c, struct barrier *b)
+void init_game(struct map *m, struct car *c, struct barrier *b, int n)
 {
         int i;
         init_map(m);
         init_car(c, start_pos, 0, *m);
-        for (i = 0; i < barrier_count; i++)
+        for (i = 0; i < n; i++)
                 init_barrier(&b[i], i, 0, *m);
-        check_barrier(b, barrier_count);
+        check_barrier(b, n);
 }
 
 void show_map(struct map m)
@@ -196,7 +196,7 @@ void move_barrier(struct barrier *b, int n, struct map m)
                         init_barrier(&b[i], i, 0, m);
                 }
         }
-        check_barrier(b, barrier_count);
+        check_barrier(b, n);
         show_barrier(b, n);
 }
 
@@ -212,24 +212,24 @@ int check_collision(struct car c, struct barrier *b, int n)
         return 0;
 }
 
-void draw_screen(struct map m, struct car c, struct barrier *b)
+void draw_screen(struct map m, struct car c, struct barrier *b, int n)
 {
         clear();
         show_map(m);
         show_road(m, c.score);
         show_car(c);
-        show_barrier(b, barrier_count);
+        show_barrier(b, n);
 }
 
-void handle_resize(struct map *m, struct car *c, struct barrier *b)
+void handle_resize(struct map *m, struct car *c, struct barrier *b, int n)
 {
         int i;
         init_map(m);
         init_car(c, c->pos, c->score, *m);
-        for (i = 0; i < barrier_count; i++)
+        for (i = 0; i < n; i++)
                 init_barrier(&b[i], i, 0, *m);
-        check_barrier(b, barrier_count);
-        draw_screen(*m, *c, b);
+        check_barrier(b, n);
+        draw_screen(*m, *c, b, n);
 }
 
 int main()
@@ -253,8 +253,8 @@ int main()
                                 min_row, min_col);
                 return 1;
         }
-        init_game(&m, &c, b);
-        draw_screen(m, c, b);
+        init_game(&m, &c, b, barrier_count);
+        draw_screen(m, c, b, barrier_count);
         while ((key = getch()) != key_escape) {
                 mvprintw(0, 0, "%d", c.score);
                 switch (key) {
@@ -269,7 +269,7 @@ int main()
                         move_car(&c, 1);
                         break;
                 case KEY_RESIZE:
-                        handle_resize(&m, &c, b);
+                        handle_resize(&m, &c, b, barrier_count);
                         break;
                 }
                 show_road(m, c.score);

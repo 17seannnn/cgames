@@ -2,9 +2,7 @@ Car Reaction
 
 TODO
 
-[x] - remove barrier height from code
-
-[ ] - use barrier_count everywhere like a variable
+[x] -use barrier_count everywhere like a variable
 [ ] - add func for mvprintw() score
 [ ] - decide what i`ll do with min row and min col
 [ ] - add max score and stop game
