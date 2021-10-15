@@ -1,9 +1,8 @@
 Car Reaction                        TODO
 
-[x] - add opts help and version
-[ ] - write README and help_text
-[ ] - count version and write it
 [ ] - rename dir into car-reaction instead of car_reaction
-[ ] - refactor
+[ ] - write README and help_text
 [ ] - add config file for road
 [ ] - decide what i`ll do with min row and min col
+[ ] - refactor
+[ ] - count version and write it
