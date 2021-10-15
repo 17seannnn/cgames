@@ -20,7 +20,9 @@ enum {
         barrier_width      = road_width,
         max_score          = 32767,
         min_speed          = 50,
-        max_speed          = 75
+        max_speed          = 75,
+        car_pair           = 1,
+        barrier_pair
 };
 
 struct map {
@@ -47,6 +49,12 @@ int check_screen()
         if (row < min_row || col < min_col)
                 return 0;
         return 1;
+}
+
+void init_colors()
+{
+        init_pair(car_pair, COLOR_BLUE, COLOR_BLACK);
+        init_pair(barrier_pair, COLOR_RED, COLOR_BLACK);
 }
 
 void init_map(struct map *m)
@@ -103,6 +111,7 @@ void init_barrier(struct barrier *b, int n, int save, struct map m)
 void init_game(struct map *m, struct car *c, struct barrier *b, int n)
 {
         int i;
+        init_colors();
         init_map(m);
         init_car(c, start_pos, 0, *m);
         for (i = 0; i < n; i++)
@@ -140,7 +149,7 @@ void show_road(struct map m, int score)
 
 void show_car(struct car c)
 {
-        mvaddch(c.cur_y, c.cur_x, car_symbol);
+        mvaddch(c.cur_y, c.cur_x, car_symbol | COLOR_PAIR(car_pair));
         refresh();
 }
 
@@ -174,7 +183,7 @@ void show_barrier(struct barrier *b, int n)
                 if (b[i].step >= 0) {
                         move(b[i].cur_y, b[i].cur_x);
                         for (j = 0; j < road_width; j++)
-                                addch('=');
+                                addch('=' | COLOR_PAIR(barrier_pair));
                 }
         }
         refresh();
@@ -226,7 +235,6 @@ void speedup(int score)
         int speed = max_speed - 5 * (score / (max_score/100));
         if (speed < min_speed)
                 speed = min_speed;
-        mvprintw(0, 10, "%d    ", speed);
         refresh();
         timeout(speed);
 }
