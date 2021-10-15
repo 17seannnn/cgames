@@ -1,11 +1,9 @@
-Car Reaction
+Car Reaction                        TODO
 
-TODO
-
-[x] - add max score and stop game
-[ ] - save score in file
-[ ] - speed up game
+[x] - speed up game
 [ ] - colors
+[ ] - save score in file
+[ ] - show leaderboard
 [ ] - decide what i`ll do with min row and min col
 [ ] - add opts help and version
 [ ] - refactor

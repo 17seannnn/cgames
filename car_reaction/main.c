@@ -18,7 +18,9 @@ enum {
         road_width         = 11,
         barrier_count      = max_pos,
         barrier_width      = road_width,
-        max_score          = 100
+        max_score          = 32767,
+        min_speed          = 50,
+        max_speed          = 75
 };
 
 struct map {
@@ -219,6 +221,16 @@ int check_collision(struct car c, struct barrier *b, int n)
         return 0;
 }
 
+void speedup(int score)
+{
+        int speed = max_speed - 5 * (score / (max_score/100));
+        if (speed < min_speed)
+                speed = min_speed;
+        mvprintw(0, 10, "%d    ", speed);
+        refresh();
+        timeout(speed);
+}
+
 void draw_screen(struct map m, struct car c, struct barrier *b, int n)
 {
         clear();
@@ -269,7 +281,7 @@ int main()
         noecho();
         curs_set(0);
         keypad(stdscr, 1);
-        timeout(delay_duration);
+        timeout(min_speed);
         srand(time(NULL));
         if (!check_screen()) {
                 endwin();
@@ -304,6 +316,7 @@ int main()
                 if (c.score >= max_score)
                         break;
                 move_barrier(b, barrier_count, m);
+                speedup(c.score);
         }
         endgame(c.score);
         endwin();
