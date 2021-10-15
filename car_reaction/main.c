@@ -1,8 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <curses.h>
 #include <time.h>
+#include <curses.h>
+
+#define PACKAGE_NAME "cr"
+#define PACKAGE_NAME_LONG "car reaction"
+#define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
+#define VERSION "unknown beta" /* TODO */
+
+#define LICENSE "GPLv3"
+#define LICENSE_PAGE "https://gnu.org/licenses/gpl.html"
+#define COPYRIGHT_YEAR "2021"
+
+#define AUTHOR "Sergey S. Nikonov"
+#define AUTHOR_NICKNAME "17seannnn"
+#define AUTHOR_PAGE "https://github.com/17seannnn"
+
+#define HELP_SHORT_OPT "-h"
+#define HELP_LONG_OPT "--help"
+#define VERSION_SHORT_OPT "-v"
+#define VERSION_LONG_OPT "--version"
+
+/* TODO */
+const char help_text[] = "\
+Usage: "PACKAGE_NAME" [-OPT/--OPT]\n\
+\n\
+Some help text\n\
+\n\
+Report bugs to & %s home page: <"PACKAGE_PAGE">\n";
+
+const char version_text[] = "\
+"PACKAGE_NAME" ("PACKAGE_NAME_LONG") "VERSION"\n\
+Copyright (c) "COPYRIGHT_YEAR" "AUTHOR" ("AUTHOR_NICKNAME")\n\
+License "LICENSE": <"LICENSE_PAGE">\n\
+\n\
+Written by "AUTHOR" ("AUTHOR_NICKNAME").\n\
+Github: <"AUTHOR_PAGE">\n";
 
 enum {
         min_row            = 24,
@@ -40,6 +75,34 @@ struct barrier {
 int rrand(int max)
 {
         return (int)((double)max*rand()/(RAND_MAX+1.0));
+}
+
+void show_help()
+{
+        printf("%s", help_text);
+}
+
+void show_version()
+{
+        printf("%s", version_text);
+}
+
+int handle_opt(char **argv)
+{
+        argv++;
+        for (; *argv; argv++) {
+                if (0 == strcmp(*argv, HELP_SHORT_OPT) ||
+                    0 == strcmp(*argv, HELP_LONG_OPT)) {
+                        show_help();
+                        return 0;
+                }
+                if (0 == strcmp(*argv, VERSION_SHORT_OPT) ||
+                    0 == strcmp(*argv, VERSION_LONG_OPT)) {
+                        show_version();
+                        return 0;
+                } 
+        }
+                return 1;
 }
 
 int check_screen()
@@ -276,12 +339,14 @@ void endgame(int score)
         getch();
 }
 
-int main()
+int main(int argc, char **argv)
 {
         int res, key;
         struct map m;
         struct car c;
         struct barrier b[barrier_count];
+        if (!handle_opt(argv))
+                return 0;
         initscr();
         if (has_colors())
                 start_color();

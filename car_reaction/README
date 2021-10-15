@@ -1,9 +1,9 @@
 Car Reaction                        TODO
 
-[x] - colors
-[ ] - save score in file
-[ ] - show leaderboard
-[ ] - decide what i`ll do with min row and min col
-[ ] - add opts help and version
+[x] - add opts help and version
+[ ] - write README and help_text
+[ ] - count version and write it
+[ ] - rename dir into car-reaction instead of car_reaction
 [ ] - refactor
 [ ] - add config file for road
+[ ] - decide what i`ll do with min row and min col
