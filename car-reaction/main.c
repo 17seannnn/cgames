@@ -40,8 +40,8 @@ Written by "AUTHOR" ("AUTHOR_NICKNAME").\n\
 Github: <"AUTHOR_PAGE">\n";
 
 enum {
-        min_row            = 24,
-        min_col            = 80,
+        min_row            = 1,
+        min_col            = 1,
         key_escape         = 27,
         delay_duration     = 50,
         car_symbol         = 'I',
