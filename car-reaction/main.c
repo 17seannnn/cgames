@@ -329,7 +329,7 @@ void endgame(int score)
         sleep(1);
         clear();
         if (score < max_score)
-                show_score(score, y/2, (x-5)/2);
+                show_score(score, y/2, (x-4)/2);
         else
                 mvprintw(y/2, (x-10)/2, "You win!");
         mvprintw(y-1, 0, "Press any key to exit");

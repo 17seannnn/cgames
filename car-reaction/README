@@ -1,8 +1,8 @@
 Car Reaction                        TODO
 
-[ ] - rename dir into car-reaction instead of car_reaction
+[ ] - add config file for road or maybe settings for it in game
+[ ] - and maybe countless gameloop?
 [ ] - write README and help_text
-[ ] - add config file for road
 [ ] - decide what i`ll do with min row and min col
 [ ] - refactor
 [ ] - count version and write it
