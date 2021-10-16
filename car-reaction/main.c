@@ -25,11 +25,18 @@
 #define VERSION_SHORT_OPT "-v"
 #define VERSION_LONG_OPT "--version"
 
-/* TODO */
 const char help_text[] = "\
 Usage: "PACKAGE_NAME" [-OPT/--OPT]\n\
 \n\
-Some help text\n\
+Options\n\
+\n\
+-h, --help      show help\n\
+-v, --version   show version\n\
+\n\
+Movement\n\
+\n\
+'left arrow' and 'right arrow' or\n\
+'A','a' and 'D', 'd'\n\
 \n\
 Report bugs to & "PACKAGE_NAME" home page: <"PACKAGE_PAGE">\n";
 
