@@ -10,7 +10,7 @@
 #define PACKAGE_NAME "cr"
 #define PACKAGE_NAME_LONG "car reaction"
 #define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
-#define VERSION "unknown beta" /* TODO */
+#define VERSION "1.70"
 
 #define LICENSE "GPLv3"
 #define LICENSE_PAGE "https://gnu.org/licenses/gpl.html"

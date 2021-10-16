@@ -15,9 +15,3 @@ Options
 
 -h, --help      show help
 -v, --version   show version
-
-TODO
-
-[x] - write README
-[ ] - write help_text
-[ ] - count version and write it
