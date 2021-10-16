@@ -31,7 +31,7 @@ Usage: "PACKAGE_NAME" [-OPT/--OPT]\n\
 \n\
 Some help text\n\
 \n\
-Report bugs to & %s home page: <"PACKAGE_PAGE">\n";
+Report bugs to & "PACKAGE_NAME" home page: <"PACKAGE_PAGE">\n";
 
 const char version_text[] = "\
 "PACKAGE_NAME" ("PACKAGE_NAME_LONG") "VERSION"\n\
@@ -149,9 +149,10 @@ void init_barrier(struct barrier *b, int n, int save, struct map m)
         }
 }
 
-void init_game(struct map *m, struct car *c, struct barrier *b, int n)
+void initgame(struct map *m, struct car *c, struct barrier *b, int n)
 {
         int i;
+        timeout(max_speed);
         init_colors();
         init_map(m);
         init_car(c, start_pos, 0, *m);
@@ -300,26 +301,65 @@ void handle_resize(struct map *m, struct car *c, struct barrier *b, int n)
         draw_screen(*m, *c, b, n);
 }
 
+void playgame(struct map *m, struct car *c, struct barrier *b, int n)
+{
+        int res, key;
+        while ((key = getch()) != key_escape) {
+                show_score(c->score, 0, 0);
+                switch (key) {
+                case KEY_LEFT:
+                case 'A':
+                case 'a':
+                        move_car(c, -1);
+                        break;
+                case KEY_RIGHT:
+                case 'D':
+                case 'd':
+                        move_car(c, 1);
+                        break;
+                case KEY_RESIZE:
+                        handle_resize(m, c, b, n);
+                        break;
+                }
+                c->score++;
+                show_road(*m, c->score);
+                res = check_collision(*c, b, n);
+                if (res)
+                        break;
+                if (c->score >= max_score)
+                        break;
+                move_barrier(b, n, *m);
+                speedup(c->score);
+        }
+}
+
 void endgame(int score)
 {
         int x, y;
-        getmaxyx(stdscr, y, x);
         sleep(1);
+        getmaxyx(stdscr, y, x);
         clear();
         if (score < max_score)
-                show_score(score, y/2, (x-4)/2);
+                show_score(score, y/2, (x-3)/2);
         else
-                mvprintw(y/2, (x-10)/2, "You win!");
-        mvprintw(y-1, 0, "Press any key to exit");
+                mvprintw(y/2, (x-8)/2, "You win!");
         refresh();
-        sleep(1);
+}
+
+int ask_continue()
+{
+        int y, x, key;
+        getmaxyx(stdscr, y, x);
+        mvprintw(y/2+1, (x-14)/2, "Continue? [y/N]");
         timeout(-1);
-        getch();
+        if ((key = getch()) == 'Y' || key == 'y')
+                return 1;
+        else
+                return 0;
 }
 
 int main(int argc, char **argv)
 {
-        int res, key;
         struct map m;
         struct car c;
         struct barrier b[barrier_count];
@@ -332,38 +372,13 @@ int main(int argc, char **argv)
         noecho();
         curs_set(0);
         keypad(stdscr, 1);
-        timeout(min_speed);
         srand(time(NULL));
-        init_game(&m, &c, b, barrier_count);
-        draw_screen(m, c, b, barrier_count);
-        while ((key = getch()) != key_escape) {
-                show_score(c.score, 0, 0);
-                switch (key) {
-                case KEY_LEFT:
-                case 'A':
-                case 'a':
-                        move_car(&c, -1);
-                        break;
-                case KEY_RIGHT:
-                case 'D':
-                case 'd':
-                        move_car(&c, 1);
-                        break;
-                case KEY_RESIZE:
-                        handle_resize(&m, &c, b, barrier_count);
-                        break;
-                }
-                c.score++;
-                show_road(m, c.score);
-                res = check_collision(c, b, barrier_count);
-                if (res)
-                        break;
-                if (c.score >= max_score)
-                        break;
-                move_barrier(b, barrier_count, m);
-                speedup(c.score);
-        }
-        endgame(c.score);
+        do {
+                initgame(&m, &c, b, barrier_count);
+                draw_screen(m, c, b, barrier_count);
+                playgame(&m, &c, b, barrier_count);
+                endgame(c.score);
+        } while (ask_continue());
         endwin();
         return 0;
 }
