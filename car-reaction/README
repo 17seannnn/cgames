@@ -1,7 +1,6 @@
 Car Reaction                        TODO
 
-[x] - decide what i`ll do with min row and min col
-[ ] - add config file for road or maybe settings for it in game
+[x] - add config file for road or maybe settings for it in game
 [ ] - and maybe countless gameloop?
 [ ] - write README and help_text
 [ ] - refactor
