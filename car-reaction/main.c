@@ -43,7 +43,6 @@ Github: <"AUTHOR_PAGE">\n";
 
 enum {
         key_escape         = 27,
-        delay_duration     = 50,
         car_symbol         = 'I',
         barrier_symbol     = '=',
         start_pos          = 2,
