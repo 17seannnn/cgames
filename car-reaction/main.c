@@ -92,6 +92,17 @@ int handle_opt(char **argv)
                 return 1;
 }
 
+void initcurses()
+{
+        initscr();
+        if (has_colors())
+                start_color();
+        cbreak();
+        noecho();
+        curs_set(0);
+        keypad(stdscr, 1);
+}
+
 void init_colors()
 {
         init_pair(car_pair, car_font_color, car_bg_color);
@@ -365,13 +376,7 @@ int main(int argc, char **argv)
         struct barrier b[barrier_count];
         if (!handle_opt(argv))
                 return 0;
-        initscr();
-        if (has_colors())
-                start_color();
-        cbreak();
-        noecho();
-        curs_set(0);
-        keypad(stdscr, 1);
+        initcurses();
         srand(time(NULL));
         do {
                 initgame(&m, &c, b, barrier_count);
