@@ -103,13 +103,13 @@ void initcurses()
         keypad(stdscr, 1);
 }
 
-void init_colors()
+void initcolors()
 {
         init_pair(car_pair, car_font_color, car_bg_color);
         init_pair(barrier_pair, barrier_font_color, barrier_bg_color);
 }
 
-void init_map(struct map *m)
+void initmap(struct map *m)
 {
         int row, col;
         getmaxyx(stdscr, row, col);
@@ -121,7 +121,7 @@ void init_map(struct map *m)
         m->max_y = m->min_y + m->h - 1;
 }
 
-void init_car(struct car *c, int pos, int score, struct map m)
+void initcar(struct car *c, int pos, int score, struct map m)
 {
         c->cur_x = m.min_x + road_width * pos + pos-1 - road_width/2;
         c->cur_y = m.max_y - m.h/5;
@@ -148,7 +148,7 @@ void check_barrier(struct barrier *b, int n)
         b[0].step -= 3;
 }
 
-void init_barrier(struct barrier *b, int n, int save, struct map m)
+void initbarrier(struct barrier *b, int n, int save, struct map m)
 {
         if (save) {
                 b->cur_x = m.min_x+1 + road_width*n;
@@ -163,12 +163,13 @@ void init_barrier(struct barrier *b, int n, int save, struct map m)
 void initgame(struct map *m, struct car *c, struct barrier *b, int n)
 {
         int i;
+        srand(time(NULL));
         timeout(max_speed);
-        init_colors();
-        init_map(m);
-        init_car(c, start_pos, 0, *m);
+        initcolors();
+        initmap(m);
+        initcar(c, start_pos, 0, *m);
         for (i = 0; i < n; i++)
-                init_barrier(&b[i], i, 0, *m);
+                initbarrier(&b[i], i, 0, *m);
         check_barrier(b, n);
 }
 
@@ -264,7 +265,7 @@ void move_barrier(struct barrier *b, int n, struct map m)
                         b[i].cur_y++;
                         b[i].step++;
                 } else {
-                        init_barrier(&b[i], i, 0, m);
+                        initbarrier(&b[i], i, 0, m);
                 }
         }
         check_barrier(b, n);
@@ -304,10 +305,10 @@ void draw_screen(struct map m, struct car c, struct barrier *b, int n)
 void handle_resize(struct map *m, struct car *c, struct barrier *b, int n)
 {
         int i;
-        init_map(m);
-        init_car(c, c->pos, c->score, *m);
+        initmap(m);
+        initcar(c, c->pos, c->score, *m);
         for (i = 0; i < n; i++)
-                init_barrier(&b[i], i, 0, *m);
+                initbarrier(&b[i], i, 0, *m);
         check_barrier(b, n);
         draw_screen(*m, *c, b, n);
 }
@@ -377,7 +378,6 @@ int main(int argc, char **argv)
         if (!handle_opt(argv))
                 return 0;
         initcurses();
-        srand(time(NULL));
         do {
                 initgame(&m, &c, b, barrier_count);
                 draw_screen(m, c, b, barrier_count);
