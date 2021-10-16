@@ -5,6 +5,8 @@
 #include <time.h>
 #include <curses.h>
 
+#include "config.h"
+
 #define PACKAGE_NAME "cr"
 #define PACKAGE_NAME_LONG "car reaction"
 #define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
@@ -57,7 +59,11 @@ enum {
         min_speed          = 50,
         max_speed          = 75,
         car_pair           = 1,
-        barrier_pair
+        barrier_pair,
+        car_font_color     = COLOR_BLUE,
+        car_bg_color       = COLOR_BLACK,
+        barrier_font_color = COLOR_RED,
+        barrier_bg_color   = COLOR_BLACK
 };
 
 struct map {
@@ -116,8 +122,8 @@ int check_screen()
 
 void init_colors()
 {
-        init_pair(car_pair, COLOR_BLUE, COLOR_BLACK);
-        init_pair(barrier_pair, COLOR_RED, COLOR_BLACK);
+        init_pair(car_pair, car_font_color, car_bg_color);
+        init_pair(barrier_pair, barrier_font_color, barrier_bg_color);
 }
 
 void init_map(struct map *m)
