@@ -41,6 +41,9 @@ License "LICENSE": <"LICENSE_PAGE">\n\
 Written by "AUTHOR" ("AUTHOR_NICKNAME").\n\
 Github: <"AUTHOR_PAGE">\n";
 
+const char win_text[] = "You win!";
+const char continue_text[] = "Continue? [y/N]";
+
 enum {
         key_escape         = 27,
         car_pair           = 1,
@@ -354,7 +357,7 @@ void endgame(int score)
         if (score < max_score)
                 show_score(score, y/2, (x-3)/2);
         else
-                mvprintw(y/2, (x-8)/2, "You win!");
+                mvprintw(y/2, (x-strlen(win_text))/2, "%s", win_text);
         refresh();
 }
 
@@ -362,7 +365,7 @@ int ask_continue()
 {
         int y, x, key;
         getmaxyx(stdscr, y, x);
-        mvprintw(y/2+1, (x-14)/2, "Continue? [y/N]");
+        mvprintw(y/2+1, (x-strlen(continue_text))/2, "%s", continue_text);
         timeout(-1);
         if ((key = getch()) == 'Y' || key == 'y')
                 return 1;

@@ -1,8 +1,7 @@
 Car Reaction                        TODO
 
-[x] - and maybe countless gameloop?
-[ ] - put all texts in global const char []
-[ ] - use strlen for texts` coords
+[x] - put all texts in global const char []
+[x] - use strlen for texts` coords
 [ ] - refactor
 [ ] - write README and help_text
 [ ] - count version and write it
