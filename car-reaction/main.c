@@ -42,8 +42,6 @@ Written by "AUTHOR" ("AUTHOR_NICKNAME").\n\
 Github: <"AUTHOR_PAGE">\n";
 
 enum {
-        min_row            = 1,
-        min_col            = 1,
         key_escape         = 27,
         delay_duration     = 50,
         car_symbol         = 'I',
@@ -109,15 +107,6 @@ int handle_opt(char **argv)
                 } 
         }
                 return 1;
-}
-
-int check_screen()
-{
-        int row, col;
-        getmaxyx(stdscr, row, col);
-        if (row < min_row || col < min_col)
-                return 0;
-        return 1;
 }
 
 void init_colors()
@@ -362,12 +351,6 @@ int main(int argc, char **argv)
         keypad(stdscr, 1);
         timeout(min_speed);
         srand(time(NULL));
-        if (!check_screen()) {
-                endwin();
-                fprintf(stderr, "Resize your window to %dx%d\n",
-                                min_row, min_col);
-                return 1;
-        }
         init_game(&m, &c, b, barrier_count);
         draw_screen(m, c, b, barrier_count);
         while ((key = getch()) != key_escape) {
