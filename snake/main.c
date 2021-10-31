@@ -203,9 +203,14 @@ void hide_apple(struct apple a)
         refresh();
 }
 
+/* TODO maybe do didwin() func */
 int move_apple(struct apple *a, struct tail *s, struct map m)
 {
         initapple(a, s, m);
+        if (!is_empty(a->cur_x, a->cur_y, s)) {
+                mvprintw(0, 0, "not empty");
+                refresh();
+        }
         show_apple(*a);
         return 1;
 }
@@ -226,6 +231,7 @@ void draw_screen(struct map m, struct tail *s, struct apple a)
         show_apple(a);
 }
 
+/* TODO */
 void handle_resize()
 {
 
@@ -254,7 +260,6 @@ void playgame(struct map *m, struct tail **s, struct apple *a)
                 default:
                         set_direction(*s, (*s)->dx, (*s)->dy);
                 }
-                move_snake(*s, *m);
                 res = check_collision(*s, *a);
                 if (res < 0) {
                         add_tail(s, a->cur_x, a->cur_y);
@@ -264,9 +269,11 @@ void playgame(struct map *m, struct tail **s, struct apple *a)
                 } else if (!res) {
                         break;
                 }
+                move_snake(*s, *m);
         }
 }
 
+/* TODO */
 int ask_continue()
 {
         clear();
