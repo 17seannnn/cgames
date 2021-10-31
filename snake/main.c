@@ -9,6 +9,7 @@
 
 const char help_text[] = "";
 const char version_text[] = "";
+const char win_text[] = "";
 
 enum {
         key_escape = 27,
@@ -124,10 +125,11 @@ void initapple(struct apple *a, struct tail *s, struct map m)
         a->cur_y = y;
 }
 
-void initgame(struct map *m, struct tail **s, struct apple *a)
+void initgame(struct map *m, struct tail **s, struct apple *a, int *score)
 {
         srand(time(NULL));
         timeout(delay_duration);
+        *score = 1;
         initmap(m);
         initsnake(s, *m);
         initapple(a, *s, *m);
@@ -237,6 +239,12 @@ int check_collision(struct tail *s, struct apple a)
         return 1;
 }
 
+void show_score(int score)
+{
+        mvprintw(0, 0, "%d", score);
+        refresh();
+}
+
 void draw_screen(struct map m, struct tail *s, struct apple a)
 {
         clear();
@@ -261,10 +269,11 @@ void handle_resize(struct map *m, struct tail *s, struct apple *a)
         draw_screen(*m, s, *a);
 }
 
-int playgame(struct map *m, struct tail **s, struct apple *a)
+int playgame(struct map *m, struct tail **s, struct apple *a, int *score)
 {
         int key, res;
         while ((key = getch()) != key_escape) {
+                show_score(*score);
                 switch (key) {
                 case KEY_UP:
                         set_direction(*s, 0, -1);
@@ -287,6 +296,7 @@ int playgame(struct map *m, struct tail **s, struct apple *a)
                 res = check_collision(*s, *a);
                 if (res < 0) {
                         add_tail(s, a->cur_x, a->cur_y);
+                        ++*score;
                         if (0 == move_apple(a, *s, *m))
                                 return 1;
                 } else if (!res) {
@@ -295,6 +305,21 @@ int playgame(struct map *m, struct tail **s, struct apple *a)
                 move_snake(*s, *m);
         }
         return 0;
+}
+
+void endgame(int win, int score)
+{
+        int x, y;
+        clear();
+        getmaxyx(stdscr, y, x);
+        y /= 2;
+        x = (x - strlen(win_text))/2;
+        if (win)
+                mvprintw(y, x, "%s", win_text);
+        else
+                mvprintw(y, x, "%d", score);
+        refresh();
+        sleep(3);
 }
 
 /* TODO */
@@ -306,7 +331,7 @@ int ask_continue()
 
 int main(int argc, char **argv)
 {
-        int win;
+        int win, score;
         struct map m;
         struct tail *s = NULL;
         struct apple a;
@@ -314,14 +339,10 @@ int main(int argc, char **argv)
                 return 0;
         initcurses();
         do {
-                initgame(&m, &s, &a);
+                initgame(&m, &s, &a, &score);
                 draw_screen(m, s, a);
-                win = playgame(&m, &s, &a);
-                
-                mvprintw(0, 0, "%d", win);
-                refresh();
-                sleep(5);
-
+                win = playgame(&m, &s, &a, &score);
+                endgame(win, score);
         } while (ask_continue());
         endwin();
         return 0;
