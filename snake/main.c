@@ -221,7 +221,6 @@ int move_apple(struct apple *a, struct tail *s, struct map m)
         return 1;
 }
 
-/* TODO check if crash itself tail */
 int check_collision(struct tail *s, struct apple a)
 {
         if (s->cur_x + s->dx == a.cur_x && s->cur_y + s->dy == a.cur_y)
@@ -239,10 +238,20 @@ void draw_screen(struct map m, struct tail *s, struct apple a)
         show_apple(a);
 }
 
-/* TODO */
-void handle_resize()
+void handle_resize(struct map *m, struct tail *s, struct apple *a)
 {
-
+        int diff_x, diff_y;
+        struct map old = *m;
+        initmap(m);
+        diff_x = m->min_x - old.min_x;
+        diff_y = m->min_y - old.min_y;
+        for (; s; s = s->prev) {
+                s->cur_x += diff_x;
+                s->cur_y += diff_y;
+        }
+        a->cur_x += diff_x;
+        a->cur_y += diff_y;
+        draw_screen(*m, s, *a);
 }
 
 void playgame(struct map *m, struct tail **s, struct apple *a)
@@ -263,7 +272,7 @@ void playgame(struct map *m, struct tail **s, struct apple *a)
                         set_direction(*s, 1, 0);
                         break;
                 case KEY_RESIZE:
-                        handle_resize();
+                        handle_resize(m, *s, a);
                         break;
                 default:
                         set_direction(*s, (*s)->dx, (*s)->dy);
