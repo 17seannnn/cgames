@@ -162,14 +162,6 @@ void hide_snake(struct tail *s)
         refresh();
 }
 
-void set_direction(struct tail *s, int dx, int dy)
-{
-        if (s->prev)
-                set_direction(s->prev, s->dx, s->dy);
-        s->dx = dx;
-        s->dy = dy;
-}
-
 void check(int *coord, int min, int max)
 {
         if (*coord < min)
@@ -178,16 +170,30 @@ void check(int *coord, int min, int max)
                 *coord = min;
 }
 
+void set_direction(struct tail *s, int dx, int dy)
+{
+        if ((s->dx != 0 && s->dx == -dx) || (s->dy != 0 && s->dy == -dy))
+                return;
+        if (s->prev)
+                set_direction(s->prev, s->dx, s->dy);
+        s->dx = dx;
+        s->dy = dy;
+}
+
+void set_coords(struct tail *s, int x, int y, struct map m)
+{
+        if (s->prev)
+                set_coords(s->prev, s->cur_x, s->cur_y, m);
+        s->cur_x = x;
+        s->cur_y = y;
+        check(&s->cur_x, m.min_x+1, m.max_x-1);
+        check(&s->cur_y, m.min_y+1, m.max_y-1);
+}
+
 void move_snake(struct tail *s, struct map m)
 {
-        struct tail *t = s;
         hide_snake(s);
-        for (; t; t = t->prev) {
-                t->cur_x += t->dx;
-                t->cur_y += t->dy;
-                check(&t->cur_x, m.min_x+1, m.max_x-1);
-                check(&t->cur_y, m.min_y+1, m.max_y-1);
-        }
+        set_coords(s, s->cur_x + s->dx, s->cur_y + s->dy, m);
         show_snake(s);
 }
 
@@ -220,6 +226,8 @@ int check_collision(struct tail *s, struct apple a)
 {
         if (s->cur_x + s->dx == a.cur_x && s->cur_y + s->dy == a.cur_y)
                 return -1;
+        if (0 == is_empty(s->cur_x + s->dx, s->cur_y + s->dy, s->prev))
+                return 0;
         return 1;
 }
 
