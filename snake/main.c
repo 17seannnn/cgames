@@ -213,10 +213,6 @@ void hide_apple(struct apple a)
 int move_apple(struct apple *a, struct tail *s, struct map m)
 {
         initapple(a, s, m);
-        if (!is_empty(a->cur_x, a->cur_y, s)) {
-                mvprintw(0, 0, "not empty");
-                refresh();
-        }
         show_apple(*a);
         return 1;
 }
