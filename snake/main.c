@@ -133,6 +133,24 @@ void initgame(struct map *m, struct tail **s, struct apple *a)
         initapple(a, *s, *m);
 }
 
+void check(int *coord, int min, int max)
+{
+        if (*coord < min)
+                *coord = max;
+        if (*coord > max)
+                *coord = min;
+}
+
+int didwin(struct map m, struct tail *s)
+{
+        int x, y;
+        for (y = m.min_y + 1; y < m.max_y; y++)
+                for (x = m.min_x + 1; x < m.max_x; x++)
+                        if (is_empty(x, y, s))
+                                return 0;
+        return 1;
+}
+
 void show_map(struct map m)
 {
         int x, y;
@@ -160,14 +178,6 @@ void hide_snake(struct tail *s)
         for (; s; s = s->prev)
                 mvaddch(s->cur_y, s->cur_x, ' ');
         refresh();
-}
-
-void check(int *coord, int min, int max)
-{
-        if (*coord < min)
-                *coord = max;
-        if (*coord > max)
-                *coord = min;
 }
 
 void set_direction(struct tail *s, int dx, int dy)
@@ -209,9 +219,10 @@ void hide_apple(struct apple a)
         refresh();
 }
 
-/* TODO maybe do didwin() func */
 int move_apple(struct apple *a, struct tail *s, struct map m)
 {
+        if (didwin(m, s))
+                return 0;
         initapple(a, s, m);
         show_apple(*a);
         return 1;
@@ -250,7 +261,7 @@ void handle_resize(struct map *m, struct tail *s, struct apple *a)
         draw_screen(*m, s, *a);
 }
 
-void playgame(struct map *m, struct tail **s, struct apple *a)
+int playgame(struct map *m, struct tail **s, struct apple *a)
 {
         int key, res;
         while ((key = getch()) != key_escape) {
@@ -276,14 +287,14 @@ void playgame(struct map *m, struct tail **s, struct apple *a)
                 res = check_collision(*s, *a);
                 if (res < 0) {
                         add_tail(s, a->cur_x, a->cur_y);
-                        res = move_apple(a, *s, *m);
-                        if (!res)
-                                break;
+                        if (0 == move_apple(a, *s, *m))
+                                return 1;
                 } else if (!res) {
                         break;
                 }
                 move_snake(*s, *m);
         }
+        return 0;
 }
 
 /* TODO */
@@ -295,6 +306,7 @@ int ask_continue()
 
 int main(int argc, char **argv)
 {
+        int win;
         struct map m;
         struct tail *s = NULL;
         struct apple a;
@@ -304,7 +316,12 @@ int main(int argc, char **argv)
         do {
                 initgame(&m, &s, &a);
                 draw_screen(m, s, a);
-                playgame(&m, &s, &a);
+                win = playgame(&m, &s, &a);
+                
+                mvprintw(0, 0, "%d", win);
+                refresh();
+                sleep(5);
+
         } while (ask_continue());
         endwin();
         return 0;
