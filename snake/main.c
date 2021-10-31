@@ -276,15 +276,23 @@ int playgame(struct map *m, struct tail **s, struct apple *a, int *score)
                 show_score(*score);
                 switch (key) {
                 case KEY_UP:
+                case 'W': case 'w':
+                case 'K': case 'k':
                         set_direction(*s, 0, -1);
                         break;
                 case KEY_DOWN:
+                case 'S': case 's':
+                case 'J': case 'j':
                         set_direction(*s, 0, 1);
                         break;
                 case KEY_LEFT:
+                case 'A': case 'a':
+                case 'H': case 'h':
                         set_direction(*s, -1, 0);
                         break;
                 case KEY_RIGHT:
+                case 'D': case 'd':
+                case 'L': case 'l':
                         set_direction(*s, 1, 0);
                         break;
                 case KEY_RESIZE:
