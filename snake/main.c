@@ -9,7 +9,8 @@
 
 const char help_text[] = "";
 const char version_text[] = "";
-const char win_text[] = "";
+const char win_text[] = "You win!";
+const char continue_text[] = "Continue? [y/N]";
 
 enum {
         key_escape = 27,
@@ -327,13 +328,18 @@ void endgame(int win, int score)
         else
                 mvprintw(y, x, "%d", score);
         refresh();
-        sleep(3);
 }
 
-/* TODO */
 int ask_continue()
 {
-        clear();
+        int y, x, key;
+        getmaxyx(stdscr, y, x);
+        mvprintw(y/2 + 1, (x - strlen(continue_text))/2, "%s", continue_text);
+        refresh();
+        sleep(3);
+        timeout(-1);
+        if ((key = getch()) == 'Y' || key == 'y')
+                return 1;
         return 0;
 }
 
