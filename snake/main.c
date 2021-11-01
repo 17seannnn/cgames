@@ -44,6 +44,16 @@ int rrand(int max)
         return (int)((double)max*rand()/(RAND_MAX+1.0));
 }
 
+int intlen(int i)
+{
+        int l = 0;
+        do {
+                i /= 10;
+                l++;
+        } while (i);
+        return l;
+}
+
 void show_help()
 {
         printf("%s", help_text);
@@ -223,13 +233,10 @@ void hide_apple(struct apple a)
         refresh();
 }
 
-int move_apple(struct apple *a, struct tail *s, struct map m)
+void move_apple(struct apple *a, struct tail *s, struct map m)
 {
-        if (didwin(m, s))
-                return 0;
         initapple(a, s, m);
         show_apple(*a);
-        return 1;
 }
 
 int check_collision(struct tail *s, struct apple a)
@@ -272,7 +279,7 @@ void handle_resize(struct map *m, struct tail *s, struct apple *a)
         draw_screen(*m, s, *a);
 }
 
-int playgame(struct map *m, struct tail **s, struct apple *a, int *score)
+void playgame(struct map *m, struct tail **s, struct apple *a, int *score)
 {
         int key, res;
         while ((key = getch()) != key_escape) {
@@ -308,29 +315,32 @@ int playgame(struct map *m, struct tail **s, struct apple *a, int *score)
                 if (res < 0) {
                         add_tail(s, a->cur_x, a->cur_y);
                         ++*score;
-                        if (0 == move_apple(a, *s, *m))
-                                return 1;
+                        if (*score >= max_score)
+                                break;
+                        move_apple(a, *s, *m);
                 } else if (!res) {
+                        sleep(1);
                         break;
                 }
                 move_snake(*s, *m);
         }
-        return 0;
 }
 
-void endgame(int win, int score)
+void endgame(int score)
 {
-        char s[max_score];
+        char *s;
         int x, y;
         clear();
         getmaxyx(stdscr, y, x);
         y /= 2;
-        if (win) {
+        if (score >= max_score) {
                 x = (x - strlen(win_text))/2;
                 mvprintw(y, x, "%s", win_text);
         } else {
+                s = malloc(sizeof(int) * intlen(score) + 1);
                 sprintf(s, "%d", score);
                 x = (x - strlen(s))/2;
+                free(s);
                 mvprintw(y, x, "%d", score);
         }
         refresh();
@@ -351,7 +361,7 @@ int ask_continue()
 
 int main(int argc, char **argv)
 {
-        int win, score;
+        int score;
         struct map m;
         struct tail *s = NULL;
         struct apple a;
@@ -361,8 +371,8 @@ int main(int argc, char **argv)
         do {
                 initgame(&m, &s, &a, &score);
                 draw_screen(m, s, a);
-                win = playgame(&m, &s, &a, &score);
-                endgame(win, score);
+                playgame(&m, &s, &a, &score);
+                endgame(score);
         } while (ask_continue());
         endwin();
         return 0;
