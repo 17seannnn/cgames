@@ -239,14 +239,14 @@ void move_apple(struct apple *a, struct tail *s, struct map m)
         show_apple(*a);
 }
 
-int check_collision(struct tail *s, struct apple a)
+int check_collision(struct tail *s, struct apple a, struct map m)
 {
-        /* TODO do check() after sum s->dx/y */
-        if (s->cur_x + s->dx == a.cur_x && s->cur_y + s->dy == a.cur_y)
+        int x = s->cur_x + s->dx, y = s->cur_y + s->dy;
+        check(&x, m.min_x+1, m.max_x-1);
+        check(&y, m.min_y+1, m.max_y-1);
+        if (x == a.cur_x && y == a.cur_y)
                 return -1;
-        if (0 == is_empty(s->cur_x + s->dx, s->cur_y + s->dy, s->prev))
-                return 0;
-        return 1;
+        return is_empty(s->cur_x + s->dx, s->cur_y + s->dy, s->prev);
 }
 
 void show_score(int score)
@@ -311,7 +311,7 @@ void playgame(struct map *m, struct tail **s, struct apple *a, int *score)
                 default:
                         set_direction(*s, (*s)->dx, (*s)->dy);
                 }
-                res = check_collision(*s, *a);
+                res = check_collision(*s, *a, *m);
                 if (res < 0) {
                         add_tail(s, a->cur_x, a->cur_y);
                         ++*score;
