@@ -17,6 +17,7 @@ enum {
 
         map_height = 16,
         map_width  = 50,
+        max_score  = (map_height - 2) * (map_width - 2),
 
         delay_duration = 100,
 
@@ -233,6 +234,7 @@ int move_apple(struct apple *a, struct tail *s, struct map m)
 
 int check_collision(struct tail *s, struct apple a)
 {
+        /* TODO do check() after sum s->dx/y */
         if (s->cur_x + s->dx == a.cur_x && s->cur_y + s->dy == a.cur_y)
                 return -1;
         if (0 == is_empty(s->cur_x + s->dx, s->cur_y + s->dy, s->prev))
@@ -318,15 +320,19 @@ int playgame(struct map *m, struct tail **s, struct apple *a, int *score)
 
 void endgame(int win, int score)
 {
+        char s[max_score];
         int x, y;
         clear();
         getmaxyx(stdscr, y, x);
         y /= 2;
-        x = (x - strlen(win_text))/2;
-        if (win)
+        if (win) {
+                x = (x - strlen(win_text))/2;
                 mvprintw(y, x, "%s", win_text);
-        else
+        } else {
+                sprintf(s, "%d", score);
+                x = (x - strlen(s))/2;
                 mvprintw(y, x, "%d", score);
+        }
         refresh();
 }
 
