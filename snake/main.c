@@ -7,8 +7,48 @@
 
 #include "config.h"
 
-const char help_text[] = "";
-const char version_text[] = "";
+#define PACKAGE_NAME "???"
+#define PACKAGE_NAME_LONG "???"
+#define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
+#define VERSION "???"
+
+#define LICENSE "GPLv3"
+#define LICENSE_PAGE "https://gnu.org/licenses/gpl.html"
+#define COPYRIGHT_YEAR "2021"
+
+#define AUTHOR "Sergey S. Nikonov"
+#define AUTHOR_NICKNAME "17seannnn"
+#define AUTHOR_PAGE "https://github.com/17seannnn"
+
+#define HELP_SHORT_OPT "-h"
+#define HELP_LONG_OPT "--help"
+#define VERSION_SHORT_OPT "-v"
+#define VERSION_LONG_OPT "--version"
+
+const char help_text[] = "\
+Usage: "PACKAGE_NAME" [-OPT/--OPT]\n\
+\n\
+Options\n\
+\n\
+-h, --help      show help\n\
+-v, --version   show version\n\
+\n\
+Movement\n\
+\n\
+Arrows or\n\
+WASD   or\n\
+HJKL\n\
+\n\
+Report bugs to & "PACKAGE_NAME" home page: <"PACKAGE_PAGE">\n";
+
+const char version_text[] = "\
+"PACKAGE_NAME" ("PACKAGE_NAME_LONG") "VERSION"\n\
+Copyright (c) "COPYRIGHT_YEAR" "AUTHOR" ("AUTHOR_NICKNAME")\n\
+License "LICENSE": <"LICENSE_PAGE">\n\
+\n\
+Written by "AUTHOR" ("AUTHOR_NICKNAME").\n\
+Github: <"AUTHOR_PAGE">\n";
+
 const char win_text[] = "You win!";
 const char continue_text[] = "Continue? [y/N]";
 
@@ -66,7 +106,20 @@ void show_version()
 
 int handle_opt(char **argv)
 {
-        return 1;
+        argv++;
+        for (; *argv; argv++) {
+                if (0 == strcmp(*argv, HELP_SHORT_OPT) ||
+                    0 == strcmp(*argv, HELP_LONG_OPT)) {
+                        show_help();
+                        return 0;
+                }
+                if (0 == strcmp(*argv, VERSION_SHORT_OPT) ||
+                    0 == strcmp(*argv, VERSION_LONG_OPT)) {
+                        show_version();
+                        return 0;
+                } 
+        }
+                return 1;
 }
 
 void initcurses()
