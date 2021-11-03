@@ -61,9 +61,14 @@ enum {
 
         delay_duration = 100,
 
-        hor_symb   = '-',
-        ver_symb   = '|',
-        apple_symb = '@'
+        standing_symb = '.',
+        left_symb     = '<',
+        right_symb    = '>',
+        up_symb       = '^',
+        down_symb     = 'v',
+        hor_symb      = '-',
+        ver_symb      = '|',
+        apple_symb    = '@'
 };
 
 struct map {
@@ -234,6 +239,14 @@ void show_map(struct map m)
 
 void show_snake(struct tail *s)
 {
+        if (s->dx != 0)
+                mvaddch(s->cur_y, s->cur_x, s->dx < 0 ? left_symb : right_symb);
+        else
+        if (s->dy != 0)
+                mvaddch(s->cur_y, s->cur_x, s->dy < 0 ? up_symb : down_symb);
+        else
+                mvaddch(s->cur_y, s->cur_x, standing_symb);
+        s = s->prev;
         for (; s; s = s->prev)
                 mvaddch(s->cur_y, s->cur_x, s->dx ? hor_symb : ver_symb);
         refresh();
