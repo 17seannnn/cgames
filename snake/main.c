@@ -318,6 +318,7 @@ void playgame(struct map *m, struct tail **s, struct apple *a, int *score)
                                 break;
                         move_apple(a, *s, *m);
                 } else if (!res) {
+                        draw_screen(*m, *s, *a);
                         sleep(1);
                         break;
                 }
