@@ -111,10 +111,9 @@ void initsnake(struct tail **s, struct map m)
         struct tail *t;
         while (*s) {
                 t = *s;
-                s = &(*s)->prev;
+                *s = (*s)->prev;
                 free(t);
         }
-        *s = NULL;
         add_tail(s, (m.min_x + m.max_x) / 2, (m.min_y + m.max_y) / 2);
 }
 
@@ -352,7 +351,7 @@ int ask_continue()
         getmaxyx(stdscr, y, x);
         mvprintw(y/2 + 1, (x - strlen(continue_text))/2, "%s", continue_text);
         refresh();
-        sleep(3);
+        sleep(1);
         timeout(-1);
         if ((key = getch()) == 'Y' || key == 'y')
                 return 1;
