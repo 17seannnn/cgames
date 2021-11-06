@@ -68,7 +68,20 @@ enum {
         down_symb     = 'v',
         hor_symb      = '-',
         ver_symb      = '|',
-        apple_symb    = '@'
+        apple_symb    = '@',
+        bonus_symb    = '?',
+
+        apple_collision = -1,
+        bonus_collision = -2,
+
+        bonus_chance = 100,
+        bonus_end = -1,
+        bonus_off = 0,
+        bonus_on  = 1,
+
+        min_steps   = 50,
+        range_steps = 50
+
 };
 
 struct map {
@@ -82,6 +95,11 @@ struct tail {
 
 struct apple {
         int cur_x, cur_y;
+};
+
+struct bonus {
+        int cur_x, cur_y, steps, status;
+        double effect;
 };
 
 int rrand(int max)
@@ -138,6 +156,40 @@ void initcurses()
         keypad(stdscr, 1);
 }
 
+int is_tail(int x, int y, struct tail *s)
+{
+        for (; s; s = s->prev)
+                if (x == s->cur_x && y == s->cur_y)
+                        return 1;
+        return 0;
+}
+
+int is_apple(int x, int y, struct apple a)
+{
+        if (x == a.cur_x && y == a.cur_y)
+                return 1;
+        return 0;
+}
+
+int is_bonus(int x, int y, struct bonus b)
+{
+        if (x == b.cur_x && y == b.cur_y)
+                return 1;
+        return 0;
+}
+
+int has_empty(struct map m, struct tail *s, struct apple a, struct bonus b)
+{
+        int x, y;
+        for (y = m.min_y + 1; y < m.max_y; y++)
+                for (x = m.min_x + 1; x < m.max_x; x++)
+                        if (!is_tail(x, y, s)  &&
+                            !is_apple(x, y, a) &&
+                            !is_bonus(x, y, b))
+                                return 1;
+        return 0;
+}
+
 void initmap(struct map *m)
 {
         int y, x;
@@ -175,33 +227,64 @@ void initsnake(struct tail **s, struct map m)
         add_tail(s, (m.min_x + m.max_x) / 2, (m.min_y + m.max_y) / 2);
 }
 
-int is_empty(int x, int y, struct tail *s)
-{
-        for (; s; s = s->prev)
-                if (x == s->cur_x && y == s->cur_y)
-                        return 0;
-        return 1;
-}
-
-void initapple(struct apple *a, struct tail *s, struct map m)
+void initapple(struct apple *a, struct tail *s, struct bonus *b, struct map m)
 {
         int x, y;
+        /*
+         * We may have a situation where we have
+         * no empty space due to the bonus
+         */
+        if (!has_empty(m, s, *a, *b)) {
+                a->cur_x = b->cur_x;
+                a->cur_y = b->cur_y;
+                b->cur_x = -1;
+                b->cur_y = -1;
+                return;
+        }
         do {
                 x = m.min_x + rrand(map_width-2) + 1;
                 y = m.min_y + rrand(map_height-2) + 1;
-        } while (!is_empty(x, y, s));
+        } while (is_tail(x, y, s) || is_bonus(x, y, *b));
         a->cur_x = x;
         a->cur_y = y;
 }
 
-void initgame(struct map *m, struct tail **s, struct apple *a, int *score)
+void initbonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
+{
+        int x, y;
+        if (!has_empty(m, s, a, *b))
+                return;
+        do {
+                x = m.min_x + rrand(map_width-2) + 1;
+                y = m.min_y + rrand(map_height-2) + 1;
+        } while (is_tail(x, y, s) || is_apple(x, y, a));
+        b->cur_x = x;
+        b->cur_y = y;
+        b->steps = min_steps + rrand(range_steps);
+        if (rrand(2))
+                b->effect = 1 + 0.25 * (rrand(4) + 1);
+        else
+                b->effect = 0.25 * (rrand(4) + 1);
+        b->status = bonus_off;
+}
+
+void initgame(struct map *m,
+              struct tail **s,
+              struct apple *a,
+              struct bonus *b,
+              int *score)
 {
         srand(time(NULL));
         timeout(delay_duration);
         *score = 1;
+        a->cur_x = -1;
+        a->cur_y = -1;
+        b->cur_x = -1;
+        b->cur_y = -1;
         initmap(m);
         initsnake(s, *m);
-        initapple(a, *s, *m);
+        initapple(a, *s, b, *m);
+        initbonus(b, *s, *a, *m);
 }
 
 void check(int *coord, int min, int max)
@@ -210,16 +293,6 @@ void check(int *coord, int min, int max)
                 *coord = max;
         if (*coord > max)
                 *coord = min;
-}
-
-int didwin(struct map m, struct tail *s)
-{
-        int x, y;
-        for (y = m.min_y + 1; y < m.max_y; y++)
-                for (x = m.min_x + 1; x < m.max_x; x++)
-                        if (is_empty(x, y, s))
-                                return 0;
-        return 1;
 }
 
 void show_map(struct map m)
@@ -292,26 +365,54 @@ void show_apple(struct apple a)
         refresh();
 }
 
-void hide_apple(struct apple a)
+void move_apple(struct apple *a, struct tail *s, struct bonus *b, struct map m)
 {
-        mvaddch(a.cur_y, a.cur_x, ' ');
-        refresh();
-}
-
-void move_apple(struct apple *a, struct tail *s, struct map m)
-{
-        initapple(a, s, m);
+        initapple(a, s, b, m);
         show_apple(*a);
 }
 
-int check_collision(struct tail *s, struct apple a, struct map m)
+void show_bonus(struct bonus b)
+{
+        mvaddch(b.cur_y, b.cur_x, bonus_symb);
+        refresh();
+}
+
+void move_bonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
+{
+        initbonus(b, s, a, m);
+        show_bonus(*b);
+}
+
+void handle_bonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
+{
+        switch (b->status) {
+        case bonus_end:
+                timeout(delay_duration);
+                if (rrand(100) < bonus_chance)
+                        move_bonus(b, s, a, m);
+        case bonus_off:
+                return;
+        case bonus_on:
+                timeout((int)(delay_duration * b->effect));
+                b->steps--;
+                if (b->steps <= 0)
+                        b->status = bonus_end;
+        }
+}
+
+int check_collision(struct tail *s,
+                    struct apple a,
+                    struct bonus b,
+                    struct map m)
 {
         int x = s->cur_x + s->dx, y = s->cur_y + s->dy;
         check(&x, m.min_x+1, m.max_x-1);
         check(&y, m.min_y+1, m.max_y-1);
         if (x == a.cur_x && y == a.cur_y)
-                return -1;
-        return is_empty(s->cur_x + s->dx, s->cur_y + s->dy, s->prev);
+                return apple_collision;
+        if (x == b.cur_x && y == b.cur_y)
+                return bonus_collision;
+        return !is_tail(s->cur_x + s->dx, s->cur_y + s->dy, s->prev);
 }
 
 void show_score(int score)
@@ -320,15 +421,19 @@ void show_score(int score)
         refresh();
 }
 
-void draw_screen(struct map m, struct tail *s, struct apple a)
+void draw_screen(struct map m, struct tail *s, struct apple a, struct bonus b)
 {
         clear();
         show_map(m);
         show_snake(s);
         show_apple(a);
+        show_bonus(b);
 }
 
-void handle_resize(struct map *m, struct tail *s, struct apple *a)
+void handle_resize(struct map *m,
+                   struct tail *s,
+                   struct apple *a,
+                   struct bonus *b)
 {
         int diff_x, diff_y;
         struct map old = *m;
@@ -341,10 +446,16 @@ void handle_resize(struct map *m, struct tail *s, struct apple *a)
         }
         a->cur_x += diff_x;
         a->cur_y += diff_y;
-        draw_screen(*m, s, *a);
+        b->cur_x += diff_x;
+        b->cur_y += diff_y;
+        draw_screen(*m, s, *a, *b);
 }
 
-void playgame(struct map *m, struct tail **s, struct apple *a, int *score)
+void playgame(struct map *m,
+              struct tail **s,
+              struct apple *a,
+              struct bonus *b,
+              int *score)
 {
         int key, res;
         while ((key = getch()) != key_escape) {
@@ -371,23 +482,30 @@ void playgame(struct map *m, struct tail **s, struct apple *a, int *score)
                         set_direction(*s, 1, 0);
                         break;
                 case KEY_RESIZE:
-                        handle_resize(m, *s, a);
+                        handle_resize(m, *s, a, b);
                         break;
                 default:
                         set_direction(*s, (*s)->dx, (*s)->dy);
                 }
-                res = check_collision(*s, *a, *m);
-                if (res < 0) {
+                res = check_collision(*s, *a, *b, *m);
+                switch (res) {
+                case apple_collision:
                         add_tail(s, a->cur_x, a->cur_y);
                         ++*score;
                         if (*score >= max_score)
-                                break;
-                        move_apple(a, *s, *m);
-                } else if (!res) {
-                        draw_screen(*m, *s, *a);
-                        sleep(1);
+                                return;
+                        move_apple(a, *s, b, *m);
                         break;
+                case bonus_collision:
+                        if (b->status != bonus_end)
+                                b->status = bonus_on;
+                        break;
+                case 0:
+                        draw_screen(*m, *s, *a, *b);
+                        sleep(1);
+                        return;
                 }
+                handle_bonus(b, *s, *a, *m);
                 move_snake(*s, *m);
         }
 }
@@ -431,13 +549,14 @@ int main(int argc, char **argv)
         struct map m;
         struct tail *s = NULL;
         struct apple a;
+        struct bonus b;
         if (!handle_opt(argv))
                 return 0;
         initcurses();
         do {
-                initgame(&m, &s, &a, &score);
-                draw_screen(m, s, a);
-                playgame(&m, &s, &a, &score);
+                initgame(&m, &s, &a, &b, &score);
+                draw_screen(m, s, a, b);
+                playgame(&m, &s, &a, &b, &score);
                 endgame(score);
         } while (ask_continue());
         endwin();
