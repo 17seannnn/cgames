@@ -190,6 +190,14 @@ int has_empty(struct map m, struct tail *s, struct apple a, struct bonus b)
         return 0;
 }
 
+void check(int *coord, int min, int max)
+{
+        if (*coord < min)
+                *coord = max;
+        if (*coord > max)
+                *coord = min;
+}
+
 void initmap(struct map *m)
 {
         int y, x;
@@ -200,20 +208,27 @@ void initmap(struct map *m)
         m->max_y = m->min_y + map_height - 1;
 }
 
-void add_tail(struct tail **s, int x, int y)
+void add_tail(struct tail **s, struct map m)
 {
         struct tail *t = malloc(sizeof(*t));
-        t->cur_x = x;
-        t->cur_y = y;
-        t->prev = *s;
-        if (t->prev) {
-                t->dx = t->prev->dx;
-                t->dy = t->prev->dy;
+        if (*s) {
+                for (; (*s)->prev ; s = &(*s)->prev)
+                        {}
+                (*s)->prev = t;
+                t->cur_x = (*s)->cur_x - (*s)->dx;
+                t->cur_y = (*s)->cur_y - (*s)->dy;
+                check(&t->cur_x, m.min_x, m.max_x);
+                check(&t->cur_y, m.min_y, m.max_y);
+                t->dx = (*s)->dx;
+                t->dy = (*s)->dy;
         } else {
+                *s = t;
+                t->cur_x = (m.min_x + m.max_x) / 2;
+                t->cur_y = (m.min_y + m.max_y) / 2;
                 t->dx = 0;
                 t->dy = 0;
         }
-        *s = t;
+                t->prev = NULL;
 }
 
 void initsnake(struct tail **s, struct map m)
@@ -224,7 +239,7 @@ void initsnake(struct tail **s, struct map m)
                 *s = (*s)->prev;
                 free(t);
         }
-        add_tail(s, (m.min_x + m.max_x) / 2, (m.min_y + m.max_y) / 2);
+        add_tail(s, m);
 }
 
 void initapple(struct apple *a, struct tail *s, struct bonus *b, struct map m)
@@ -285,14 +300,6 @@ void initgame(struct map *m,
         initsnake(s, *m);
         initapple(a, *s, b, *m);
         initbonus(b, *s, *a, *m);
-}
-
-void check(int *coord, int min, int max)
-{
-        if (*coord < min)
-                *coord = max;
-        if (*coord > max)
-                *coord = min;
 }
 
 void show_map(struct map m)
@@ -405,14 +412,11 @@ int check_collision(struct tail *s,
                     struct bonus b,
                     struct map m)
 {
-        int x = s->cur_x + s->dx, y = s->cur_y + s->dy;
-        check(&x, m.min_x+1, m.max_x-1);
-        check(&y, m.min_y+1, m.max_y-1);
-        if (x == a.cur_x && y == a.cur_y)
+        if (s->cur_x == a.cur_x && s->cur_y == a.cur_y)
                 return apple_collision;
-        if (x == b.cur_x && y == b.cur_y)
+        if (s->cur_x == b.cur_x && s->cur_y == b.cur_y)
                 return bonus_collision;
-        return !is_tail(s->cur_x + s->dx, s->cur_y + s->dy, s->prev);
+        return !is_tail(s->cur_x, s->cur_y, s->prev);
 }
 
 void show_score(int score)
@@ -487,10 +491,12 @@ void playgame(struct map *m,
                 default:
                         set_direction(*s, (*s)->dx, (*s)->dy);
                 }
+                handle_bonus(b, *s, *a, *m);
+                move_snake(*s, *m);
                 res = check_collision(*s, *a, *b, *m);
                 switch (res) {
                 case apple_collision:
-                        add_tail(s, a->cur_x, a->cur_y);
+                        add_tail(s, *m);
                         ++*score;
                         if (*score >= max_score)
                                 return;
@@ -501,12 +507,9 @@ void playgame(struct map *m,
                                 b->status = bonus_on;
                         break;
                 case 0:
-                        draw_screen(*m, *s, *a, *b);
                         sleep(1);
                         return;
                 }
-                handle_bonus(b, *s, *a, *m);
-                move_snake(*s, *m);
         }
 }
 
