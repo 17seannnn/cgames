@@ -527,6 +527,16 @@ int ask_continue()
         return 0;
 }
 
+void freegame(struct tail *s)
+{
+        struct tail *t;
+        while (*s) {
+                t = *s;
+                *s = (*s)->prev;
+                free(t);
+        }
+}
+
 int main(int argc, char **argv)
 {
         int score;
@@ -544,5 +554,6 @@ int main(int argc, char **argv)
                 endgame(score);
         } while (ask_continue());
         endwin();
+        freegame(s);
         return 0;
 }
