@@ -71,7 +71,7 @@ enum {
         apple_symb    = '@',
         bonus_symb    = '?',
 
-        bonus_chance = 100,
+        bonus_chance = 5,
         bonus_end = -1,
         bonus_off = 0,
         bonus_on  = 1,
@@ -530,9 +530,9 @@ int ask_continue()
 void freegame(struct tail *s)
 {
         struct tail *t;
-        while (*s) {
-                t = *s;
-                *s = (*s)->prev;
+        while (s) {
+                t = s;
+                s = s->prev;
                 free(t);
         }
 }
