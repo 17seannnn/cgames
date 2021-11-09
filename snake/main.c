@@ -77,7 +77,18 @@ enum {
         bonus_on  = 1,
 
         min_steps   = 50,
-        range_steps = 50
+        range_steps = 50,
+
+        map_pair = 1,
+        snake_pair,
+        apple_pair,
+        bonus_pair,
+
+        bg_color    = COLOR_BLACK,
+        map_color   = COLOR_CYAN,
+        snake_color = COLOR_GREEN,
+        apple_color = COLOR_RED,
+        bonus_color = COLOR_YELLOW
 
 };
 
@@ -151,6 +162,14 @@ void initcurses()
         noecho();
         curs_set(0);
         keypad(stdscr, 1);
+}
+
+void initcolors()
+{
+        init_pair(map_pair, map_color, bg_color);
+        init_pair(snake_pair, snake_color, bg_color);
+        init_pair(apple_pair, apple_color, bg_color);
+        init_pair(bonus_pair, bonus_color, bg_color);
 }
 
 int is_tail(int x, int y, struct tail *s)
@@ -290,6 +309,7 @@ void initgame(struct map *m,
 void show_map(struct map m)
 {
         int x, y;
+        attron(COLOR_PAIR(map_pair));
         for (y = m.min_y; y <= m.max_y; y++) {
                 if (y == m.min_y || y == m.max_y) {
                         for (x = m.min_x; x <= m.max_x; x++)
@@ -299,11 +319,13 @@ void show_map(struct map m)
                         mvaddch(y, m.max_x, ver_symb);
                 }
         }
+        attroff(COLOR_PAIR(map_pair));
         refresh();
 }
 
 void show_snake(struct tail *s)
 {
+        attron(COLOR_PAIR(snake_pair));
         if (s->dx != 0)
                 mvaddch(s->cur_y, s->cur_x, s->dx < 0 ? left_symb : right_symb);
         else
@@ -314,6 +336,7 @@ void show_snake(struct tail *s)
         s = s->prev;
         for (; s; s = s->prev)
                 mvaddch(s->cur_y, s->cur_x, s->dx ? hor_symb : ver_symb);
+        attroff(COLOR_PAIR(snake_pair));
         refresh();
 }
 
@@ -353,7 +376,7 @@ void move_snake(struct tail *s, struct map m)
 
 void show_apple(struct apple a)
 {
-        mvaddch(a.cur_y, a.cur_x, apple_symb);
+        mvaddch(a.cur_y, a.cur_x, apple_symb | COLOR_PAIR(apple_pair));
         refresh();
 }
 
@@ -365,7 +388,7 @@ void move_apple(struct apple *a, struct tail *s, struct bonus *b, struct map m)
 
 void show_bonus(struct bonus b)
 {
-        mvaddch(b.cur_y, b.cur_x, bonus_symb);
+        mvaddch(b.cur_y, b.cur_x, bonus_symb | COLOR_PAIR(bonus_pair));
         refresh();
 }
 
@@ -547,6 +570,7 @@ int main(int argc, char **argv)
         if (!handle_opt(argv))
                 return 0;
         initcurses();
+        initcolors();
         do {
                 initgame(&m, &s, &a, &b, &score);
                 draw_screen(m, s, a, b);
