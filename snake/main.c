@@ -371,7 +371,8 @@ void move_snake(struct tail *s, struct map m)
         hide_snake(s);
         set_coords(s, s->cur_x + s->dx, s->cur_y + s->dy, m);
         show_snake(s);
-        s->steps++;
+        if (s->dx || s->dy)
+                s->steps++;
 }
 
 void show_apple(struct apple a)
