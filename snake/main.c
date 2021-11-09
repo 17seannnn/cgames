@@ -50,7 +50,7 @@ Written by "AUTHOR" ("AUTHOR_NICKNAME").\n\
 Github: <"AUTHOR_PAGE">\n";
 
 const char win_text[] = "You win!";
-const char continue_text[] = "Continue? [y/N]";
+const char continue_text[] = "Continue? [y/N] and press ENTER:";
 
 enum {
         key_escape = 27,
@@ -539,13 +539,21 @@ void endgame(int score)
 
 int ask_continue()
 {
-        int y, x, key;
+        int y, x, key, ans = 'N';
         getmaxyx(stdscr, y, x);
         mvprintw(y/2 + 1, (x - strlen(continue_text))/2, "%s", continue_text);
         refresh();
-        sleep(1);
         timeout(-1);
-        if ((key = getch()) == 'Y' || key == 'y')
+        y = getcury(stdscr);
+        x = getcurx(stdscr) + 1;
+        do {
+                key = getch();
+                if (key == 'Y' || key == 'y' || key == 'N' || key == 'n') {
+                        ans = key;
+                        mvaddch(y, x, key);
+                }
+        } while (key != '\n');
+        if (ans == 'Y' || ans == 'y')
                 return 1;
         return 0;
 }
