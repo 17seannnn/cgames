@@ -50,7 +50,8 @@ Written by "AUTHOR" ("AUTHOR_NICKNAME").\n\
 Github: <"AUTHOR_PAGE">\n";
 
 const char win_text[] = "You win!";
-const char continue_text[] = "Continue? [y/N] and press ENTER:";
+const char continue_text[] = "Continue? [y/N]";
+const char endgame_text[] = "Steps: %d   Score: %d";
 
 enum {
         key_escape = 27,
@@ -98,6 +99,7 @@ struct map {
 
 struct tail {
         int cur_x, cur_y, dx, dy;
+        int steps, score;
         struct tail *prev;
 };
 
@@ -243,6 +245,8 @@ void add_tail(struct tail **s, struct map m)
                 t->cur_y = (m.min_y + m.max_y) / 2;
                 t->dx = 0;
                 t->dy = 0;
+                t->steps = 0;
+                t->score = 1;
         }
                 t->prev = NULL;
 }
@@ -291,15 +295,10 @@ void initbonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
         b->status = bonus_off;
 }
 
-void initgame(struct map *m,
-              struct tail **s,
-              struct apple *a,
-              struct bonus *b,
-              int *score)
+void initgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
 {
         srand(time(NULL));
         timeout(delay_duration);
-        *score = 1;
         initmap(m);
         initsnake(s, *m);
         initapple(a, *s, *m);
@@ -429,9 +428,9 @@ int check_collision(struct tail *s,
         return !is_tail(s->cur_x, s->cur_y, s->prev);
 }
 
-void show_score(int score)
+void show_info(int steps, int score)
 {
-        mvprintw(0, 0, "%d", score);
+        mvprintw(0, 0, "%d %d", steps, score);
         refresh();
 }
 
@@ -465,15 +464,11 @@ void handle_resize(struct map *m,
         draw_screen(*m, s, *a, *b);
 }
 
-void playgame(struct map *m,
-              struct tail **s,
-              struct apple *a,
-              struct bonus *b,
-              int *score)
+void playgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
 {
         int key, res;
         while ((key = getch()) != key_escape) {
-                show_score(*score);
+                show_info((*s)->steps, (*s)->score);
                 switch (key) {
                 case KEY_UP:
                 case 'W': case 'w':
@@ -506,8 +501,9 @@ void playgame(struct map *m,
                 res = check_collision(*s, *a, b, *m);
                 if (res < 0) {
                         add_tail(s, *m);
-                        ++*score;
-                        if (*score >= max_score)
+                        (*s)->steps++;
+                        (*s)->score++;
+                        if ((*s)->score >= max_score)
                                 return;
                         move_apple(a, *s, b, *m);
                 } else if (!res) {
@@ -517,9 +513,8 @@ void playgame(struct map *m,
         }
 }
 
-void endgame(int score)
+void endgame(int steps, int score)
 {
-        char *s;
         int x, y;
         clear();
         getmaxyx(stdscr, y, x);
@@ -528,11 +523,8 @@ void endgame(int score)
                 x = (x - strlen(win_text))/2;
                 mvprintw(y, x, "%s", win_text);
         } else {
-                s = malloc(sizeof(int) * intlen(score) + 1);
-                sprintf(s, "%d", score);
-                x = (x - strlen(s))/2;
-                free(s);
-                mvprintw(y, x, "%d", score);
+                x = (x - strlen(endgame_text)) / 2;
+                mvprintw(y, x, endgame_text, steps, score);
         }
         refresh();
 }
@@ -570,7 +562,6 @@ void freegame(struct tail *s)
 
 int main(int argc, char **argv)
 {
-        int score;
         struct map m;
         struct tail *s = NULL;
         struct apple a;
@@ -580,10 +571,10 @@ int main(int argc, char **argv)
         initcurses();
         initcolors();
         do {
-                initgame(&m, &s, &a, &b, &score);
+                initgame(&m, &s, &a, &b);
                 draw_screen(m, s, a, b);
-                playgame(&m, &s, &a, &b, &score);
-                endgame(score);
+                playgame(&m, &s, &a, &b);
+                endgame(s->steps, s->score);
         } while (ask_continue());
         endwin();
         freegame(s);
