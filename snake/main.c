@@ -39,6 +39,8 @@ Arrows or\n\
 WASD   or\n\
 HJKL\n\
 \n\
+Esc - leave the game\n\
+\n\
 Report bugs to & "PACKAGE_NAME" home page: <"PACKAGE_PAGE">\n";
 
 const char version_text[] = "\
