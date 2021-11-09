@@ -7,8 +7,8 @@
 
 #include "config.h"
 
-#define PACKAGE_NAME "???"
-#define PACKAGE_NAME_LONG "???"
+#define PROGRAM_NAME "csnake"
+#define PACKAGE_NAME "cgames"
 #define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
 #define VERSION "???"
 
@@ -26,7 +26,7 @@
 #define VERSION_LONG_OPT "--version"
 
 const char help_text[] = "\
-Usage: "PACKAGE_NAME" [-OPT/--OPT]\n\
+Usage: "PROGRAM_NAME" [-OPT/--OPT]\n\
 \n\
 Options\n\
 \n\
@@ -42,7 +42,7 @@ HJKL\n\
 Report bugs to & "PACKAGE_NAME" home page: <"PACKAGE_PAGE">\n";
 
 const char version_text[] = "\
-"PACKAGE_NAME" ("PACKAGE_NAME_LONG") "VERSION"\n\
+"PROGRAM_NAME" ("PACKAGE_NAME") "VERSION"\n\
 Copyright (c) "COPYRIGHT_YEAR" "AUTHOR" ("AUTHOR_NICKNAME")\n\
 License "LICENSE": <"LICENSE_PAGE">\n\
 \n\
