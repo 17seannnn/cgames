@@ -371,6 +371,7 @@ void move_snake(struct tail *s, struct map m)
         hide_snake(s);
         set_coords(s, s->cur_x + s->dx, s->cur_y + s->dy, m);
         show_snake(s);
+        s->steps++;
 }
 
 void show_apple(struct apple a)
@@ -501,7 +502,6 @@ void playgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
                 res = check_collision(*s, *a, b, *m);
                 if (res < 0) {
                         add_tail(s, *m);
-                        (*s)->steps++;
                         (*s)->score++;
                         if ((*s)->score >= max_score)
                                 return;
