@@ -7,8 +7,8 @@
 
 #include "config.h"
 
-#define PACKAGE_NAME "cr"
-#define PACKAGE_NAME_LONG "car reaction"
+#define PROGRAM_NAME "car reaction"
+#define PACKAGE_NAME "cgames"
 #define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
 #define VERSION "1.70"
 
@@ -41,7 +41,7 @@ Movement\n\
 Report bugs to & "PACKAGE_NAME" home page: <"PACKAGE_PAGE">\n";
 
 const char version_text[] = "\
-"PACKAGE_NAME" ("PACKAGE_NAME_LONG") "VERSION"\n\
+"PROGRAM_NAME" ("PACKAGE_NAME") "VERSION"\n\
 Copyright (c) "COPYRIGHT_YEAR" "AUTHOR" ("AUTHOR_NICKNAME")\n\
 License "LICENSE": <"LICENSE_PAGE">\n\
 \n\
@@ -175,7 +175,6 @@ void initgame(struct map *m, struct car *c, struct barrier *b, int n)
         int i;
         srand(time(NULL));
         timeout(max_speed);
-        initcolors();
         initmap(m);
         initcar(c, start_pos, 0, *m);
         for (i = 0; i < n; i++)
@@ -388,6 +387,7 @@ int main(int argc, char **argv)
         if (!handle_opt(argv))
                 return 0;
         initcurses();
+        initcolors();
         do {
                 initgame(&m, &c, b, barrier_count);
                 draw_screen(m, c, b, barrier_count);
