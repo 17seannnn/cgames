@@ -1,11 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
+#include <libintl.h>
 #include <unistd.h>
 #include <time.h>
 #include <curses.h>
 
 #include "config.h"
+
+#define LOCALEBASEDIR "."
+#define TEXTDOMAIN "csnake"
+
+#define _(STR) gettext(STR)
+#define N_(STR) (STR)
 
 #define PROGRAM_NAME "csnake"
 #define PACKAGE_NAME "cgames"
@@ -131,12 +139,12 @@ int intlen(int i)
 
 void show_help()
 {
-        printf("%s", help_text);
+        printf(N_("%s"), _(help_text));
 }
 
 void show_version()
 {
-        printf("%s", version_text);
+        printf(N_("%s"), _(version_text));
 }
 
 int handle_opt(char **argv)
@@ -174,6 +182,14 @@ void initcolors()
         init_pair(snake_pair, snake_color, bg_color);
         init_pair(apple_pair, apple_color, bg_color);
         init_pair(bonus_pair, bonus_color, bg_color);
+}
+
+void initgettext()
+{
+        setlocale(LC_CTYPE, N_(""));
+        setlocale(LC_MESSAGES, N_(""));
+        bindtextdomain(TEXTDOMAIN, LOCALEBASEDIR);
+        textdomain(TEXTDOMAIN);
 }
 
 int is_tail(int x, int y, struct tail *s)
@@ -434,7 +450,7 @@ int check_collision(struct tail *s,
 
 void show_info(int steps, int score)
 {
-        mvprintw(0, 0, "%d %d", steps, score);
+        mvprintw(0, 0, N_("%d %d"), steps, score);
         refresh();
 }
 
@@ -523,11 +539,11 @@ void endgame(int steps, int score)
         getmaxyx(stdscr, y, x);
         y /= 2;
         if (score >= max_score) {
-                x = (x - strlen(win_text))/2;
-                mvprintw(y, x, "%s", win_text);
+                x = (x - strlen(_(win_text)))/2;
+                mvprintw(y, x, N_("%s"), _(win_text));
         } else {
-                x = (x - strlen(endgame_text)) / 2;
-                mvprintw(y, x, endgame_text, steps, score);
+                x = (x - strlen(_(endgame_text))) / 2;
+                mvprintw(y, x, _(endgame_text), steps, score);
         }
         refresh();
 }
@@ -536,7 +552,8 @@ int ask_continue()
 {
         int y, x, key, ans = 'N';
         getmaxyx(stdscr, y, x);
-        mvprintw(y/2 + 1, (x - strlen(continue_text))/2, "%s", continue_text);
+        mvprintw(y/2 + 1,
+                (x - strlen(_(continue_text))) / 2, N_("%s"), _(continue_text));
         refresh();
         timeout(-1);
         y = getcury(stdscr);
@@ -569,6 +586,7 @@ int main(int argc, char **argv)
         struct tail *s = NULL;
         struct apple a;
         struct bonus b;
+        initgettext();
         if (!handle_opt(argv))
                 return 0;
         initcurses();
