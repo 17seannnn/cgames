@@ -541,7 +541,7 @@ void endgame(int steps, int score)
         y /= 2;
         if (score >= max_score) {
                 x = (x - strlen(_(win_text))) / 2;
-                mvprintw(y, x, N_("%s"), _(win_text));
+                mvprintw(y, x, _(win_text));
         } else {
                 x = (x - strlen(_(endgame_text))) / 2;
                 mvprintw(y, x, _(endgame_text), steps, score);
@@ -553,8 +553,7 @@ int ask_continue()
 {
         int y, x, key, ans = 'N';
         getmaxyx(stdscr, y, x);
-        mvprintw(y/2 + 1,
-                (x - strlen(_(continue_text))) / 2, N_("%s"), _(continue_text));
+        mvprintw(y/2 + 1, (x - strlen(_(continue_text))) / 2, _(continue_text));
         refresh();
         timeout(-1);
         y = getcury(stdscr);
