@@ -13,6 +13,7 @@
 #define TEXTDOMAIN "csnake"
 
 #define _(STR) gettext(STR)
+#define gettext_noop(STR) STR
 #define N_(STR) (STR)
 
 #define PROGRAM_NAME "csnake"
@@ -33,8 +34,8 @@
 #define VERSION_SHORT_OPT "-v"
 #define VERSION_LONG_OPT "--version"
 
-const char help_text[] = "\
-Usage: "PROGRAM_NAME" [-OPT/--OPT]\n\
+static const char help_text[] = gettext_noop("\
+Usage: %s [-OPT/--OPT]\n\
 \n\
 Options\n\
 \n\
@@ -49,19 +50,19 @@ HJKL\n\
 \n\
 Esc - leave the game\n\
 \n\
-Report bugs to & "PACKAGE_NAME" home page: <"PACKAGE_PAGE">\n";
+Report bugs to & %s home page: <%s>\n");
 
-const char version_text[] = "\
-"PROGRAM_NAME" ("PACKAGE_NAME") "VERSION"\n\
-Copyright (c) "COPYRIGHT_YEAR" "AUTHOR" ("AUTHOR_NICKNAME")\n\
-License "LICENSE": <"LICENSE_PAGE">\n\
+static const char version_text[] = gettext_noop("\
+%s (%s) %s\n\
+Copyright (c) %s %s (%s)\n\
+License %s: <%s>\n\
 \n\
-Written by "AUTHOR" ("AUTHOR_NICKNAME").\n\
-Github: <"AUTHOR_PAGE">\n";
+Written by %s (%s).\n\
+Github: <%s>\n");
 
-const char win_text[] = "You win!";
-const char continue_text[] = "Continue? [y/N]";
-const char endgame_text[] = "Steps: %d   Score: %d";
+static const char win_text[] = gettext_noop("You win!");
+static const char continue_text[] = gettext_noop("Continue? [y/N]");
+static const char endgame_text[] = gettext_noop("Steps: %d   Score: %d");
 
 enum {
         key_escape = 27,
@@ -139,12 +140,12 @@ int intlen(int i)
 
 void show_help()
 {
-        printf(N_("%s"), _(help_text));
+        printf(_(help_text), PROGRAM_NAME, PACKAGE_NAME, PACKAGE_PAGE);
 }
 
 void show_version()
 {
-        printf(N_("%s"), _(version_text));
+        printf(_(version_text), PROGRAM_NAME, PACKAGE_NAME, VERSION, COPYRIGHT_YEAR, AUTHOR, AUTHOR_NICKNAME, LICENSE, LICENSE_PAGE, AUTHOR, AUTHOR_NICKNAME, AUTHOR_PAGE);
 }
 
 int handle_opt(char **argv)
@@ -539,7 +540,7 @@ void endgame(int steps, int score)
         getmaxyx(stdscr, y, x);
         y /= 2;
         if (score >= max_score) {
-                x = (x - strlen(_(win_text)))/2;
+                x = (x - strlen(_(win_text))) / 2;
                 mvprintw(y, x, N_("%s"), _(win_text));
         } else {
                 x = (x - strlen(_(endgame_text))) / 2;
