@@ -10,7 +10,7 @@ LOCALEDIR=.
 case $1 in
         install)
                 cd src/;
-                $CC -ansi -pedantic -Wall -Og -g -lcurses main.c -o ../$NAME
+                $CC -ansi -pedantic -Wall -Og -g -lcursesw main.c -o ../$NAME
                 cd ..;
                 mv -f $NAME $BINDIR
                 mkdir -p $LOCALEDIR/ru/LC_MESSAGES;
