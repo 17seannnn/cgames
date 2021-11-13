@@ -2,25 +2,26 @@
 
 CC=gcc
 NAME=csnake
-BINDIR=.
-#BINDIR=/usr/local/bin
-LOCALEDIR=.
-#LOCALEDIR=/usr/share/locale/
+if sudo -v 2> /dev/null; then
+        BINDIR=/usr/local/bin
+        LOCALEDIR=/usr/share/locale/
+else
+        BINDIR=~/.local/bin
+        LOCALEDIR=~/.local/share/locale/
+fi
 
 case $1 in
         install)
-                cd src/;
-                $CC -ansi -pedantic -Wall -Og -g -lcursesw main.c -o ../$NAME
-                cd ..;
+                $CC -ansi -pedantic -Wall -Og -g -lcursesw src/main.c -o $NAME
+                msgfmt po/ru.po -o $NAME.mo
                 mv -f $NAME $BINDIR
-                mkdir -p $LOCALEDIR/ru/LC_MESSAGES;
-                msgfmt po/ru.po -o $LOCALEDIR/ru/LC_MESSAGES/$NAME.mo;;
+                mkdir -p $LOCALEDIR/ru/LC_MESSAGES
+                mv $NAME.mo $LOCALEDIR/ru/LC_MESSAGES/;;
         pot) xgettext -k="_" -f "po/POTFILES.in" -D "src" -o po/$NAME.pot;;
         mo)
-                mkdir -p $LOCALEDIR/ru/LC_MESSAGES;
+                mkdir -p $LOCALEDIR/ru/LC_MESSAGES
                 msgfmt po/ru.po -o $LOCALEDIR/ru/LC_MESSAGES/$NAME.mo;;
-        * | --help)
-                echo "\
+        * | --help) echo "\
 Usage:
 build.sh [COMMAND/--OPTION]
 
