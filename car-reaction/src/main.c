@@ -1,11 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
+#include <libintl.h>
 #include <unistd.h>
 #include <time.h>
 #include <curses.h>
 
 #include "config.h"
+
+#define _(STR) gettext(STR)
+#define gettext_noop(STR) STR
+#define N_(STR) STR
 
 #define PROGRAM_NAME "car reaction"
 #define PACKAGE_NAME "cgames"
@@ -25,8 +31,8 @@
 #define VERSION_SHORT_OPT "-v"
 #define VERSION_LONG_OPT "--version"
 
-const char help_text[] = "\
-Usage: "PACKAGE_NAME" [-OPT/--OPT]\n\
+const char help_text[] = gettext_noop("\
+Usage: %s [-OPT/--OPT]\n\
 \n\
 Options\n\
 \n\
@@ -38,18 +44,18 @@ Movement\n\
 'left arrow' and 'right arrow' or\n\
 'A','a' and 'D', 'd'\n\
 \n\
-Report bugs to & "PACKAGE_NAME" home page: <"PACKAGE_PAGE">\n";
+Report bugs to & %s home page: <%s>\n");
 
-const char version_text[] = "\
-"PROGRAM_NAME" ("PACKAGE_NAME") "VERSION"\n\
-Copyright (c) "COPYRIGHT_YEAR" "AUTHOR" ("AUTHOR_NICKNAME")\n\
-License "LICENSE": <"LICENSE_PAGE">\n\
+const char version_text[] = gettext_noop("\
+%s (%s) %s\n\
+Copyright (c) %s %s (%s)\n\
+License %s: <%s>\n\
 \n\
-Written by "AUTHOR" ("AUTHOR_NICKNAME").\n\
-Github: <"AUTHOR_PAGE">\n";
+Written by %s (%s).\n\
+Github: <%s>\n");
 
-const char win_text[] = "You win!";
-const char continue_text[] = "Continue? [y/N]";
+const char win_text[] = gettext_noop("You win!");
+const char continue_text[] = gettext_noop("Continue? [y/N]");
 
 enum {
         key_escape         = 27,
@@ -74,14 +80,27 @@ int rrand(int max)
         return (int)((double)max*rand()/(RAND_MAX+1.0));
 }
 
+void initgettext()
+{
+        setlocale(LC_CTYPE, "");
+        setlocale(LC_MESSAGES, "");
+        bindtextdomain(TEXTDOMAIN, LOCALEDIR);
+        textdomain(TEXTDOMAIN);
+}
+
 void show_help()
 {
-        printf("%s", help_text);
+        printf(_(help_text), PROGRAM_NAME, PACKAGE_NAME, PACKAGE_PAGE);
 }
 
 void show_version()
 {
-        printf("%s", version_text);
+        printf(_(version_text),
+               PROGRAM_NAME, PACKAGE_NAME, VERSION,
+               COPYRIGHT_YEAR, AUTHOR, AUTHOR_NICKNAME,
+               LICENSE, LICENSE_PAGE,
+               AUTHOR, AUTHOR_NICKNAME,
+               AUTHOR_PAGE);
 }
 
 int handle_opt(char **argv)
@@ -194,7 +213,7 @@ void show_map(struct map m)
 
 void show_score(int score, int y, int x)
 {
-        mvprintw(y, x, "%d", score);
+        mvprintw(y, x, N_("%d"), score);
 }
 
 void show_road(struct map m, int score)
@@ -363,7 +382,7 @@ void endgame(int score)
         if (score < max_score)
                 show_score(score, y/2, (x-3)/2);
         else
-                mvprintw(y/2, (x-strlen(win_text))/2, "%s", win_text);
+                mvprintw(y/2, (x-strlen(_(win_text)))/2, _(win_text));
         refresh();
 }
 
@@ -371,7 +390,7 @@ int ask_continue()
 {
         int y, x, key, ans = 'N';
         getmaxyx(stdscr, y, x);
-        mvprintw(y/2 + 1, (x - strlen(continue_text)) / 2, continue_text);
+        mvprintw(y/2 + 1, (x - strlen(_(continue_text))) / 2, _(continue_text));
         refresh();
         timeout(-1);
         y = getcury(stdscr);
@@ -393,6 +412,7 @@ int main(int argc, char **argv)
         struct map m;
         struct car c;
         struct barrier b[barrier_count];
+        initgettext();
         if (!handle_opt(argv))
                 return 0;
         initcurses();
