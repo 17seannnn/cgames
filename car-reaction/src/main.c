@@ -13,7 +13,7 @@
 #define gettext_noop(STR) STR
 #define N_(STR) STR
 
-#define PROGRAM_NAME "car reaction"
+#define PROGRAM_NAME "cr"
 #define PACKAGE_NAME "cgames"
 #define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
 #define VERSION "1.70"
