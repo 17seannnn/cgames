@@ -369,14 +369,23 @@ void endgame(int score)
 
 int ask_continue()
 {
-        int y, x, key;
+        int y, x, key, ans = 'N';
         getmaxyx(stdscr, y, x);
-        mvprintw(y/2+1, (x-strlen(continue_text))/2, "%s", continue_text);
+        mvprintw(y/2 + 1, (x - strlen(continue_text)) / 2, continue_text);
+        refresh();
         timeout(-1);
-        if ((key = getch()) == 'Y' || key == 'y')
+        y = getcury(stdscr);
+        x = getcurx(stdscr) + 1;
+        do {
+                key = getch();
+                if (key == 'Y' || key == 'y' || key == 'N' || key == 'n') {
+                        ans = key;
+                        mvaddch(y, x, key);
+                }
+        } while (key != '\n');
+        if (ans == 'Y' || ans == 'y')
                 return 1;
-        else
-                return 0;
+        return 0;
 }
 
 int main(int argc, char **argv)
