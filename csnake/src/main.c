@@ -54,7 +54,7 @@ Report bugs to & %s home page: <%s>\n");
 
 static const char version_text[] = gettext_noop("\
 %s (%s) %s\n\
-Copyright (c) %s %s (%s)\n\
+Copyright (C) %s %s (%s)\n\
 License %s: <%s>\n\
 \n\
 Written by %s (%s).\n\
@@ -145,7 +145,12 @@ void show_help()
 
 void show_version()
 {
-        printf(_(version_text), PROGRAM_NAME, PACKAGE_NAME, VERSION, COPYRIGHT_YEAR, AUTHOR, AUTHOR_NICKNAME, LICENSE, LICENSE_PAGE, AUTHOR, AUTHOR_NICKNAME, AUTHOR_PAGE);
+        printf(_(version_text),
+               PROGRAM_NAME, PACKAGE_NAME, VERSION,
+               COPYRIGHT_YEAR, AUTHOR, AUTHOR_NICKNAME,
+               LICENSE, LICENSE_PAGE,
+               AUTHOR, AUTHOR_NICKNAME,
+               AUTHOR_PAGE);
 }
 
 int handle_opt(char **argv)
@@ -187,8 +192,8 @@ void initcolors()
 
 void initgettext()
 {
-        setlocale(LC_CTYPE, N_(""));
-        setlocale(LC_MESSAGES, N_(""));
+        setlocale(LC_CTYPE, "");
+        setlocale(LC_MESSAGES, "");
         bindtextdomain(TEXTDOMAIN, LOCALEBASEDIR);
         textdomain(TEXTDOMAIN);
 }
