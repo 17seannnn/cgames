@@ -14,9 +14,10 @@ case $1 in
         install)
                 $CC -ansi -pedantic -Wall -Og -g -lncursesw src/main.c -o $NAME
                 msgfmt po/ru.po -o $NAME.mo
+                mkdir -p $BINDIR
                 mv -f $NAME $BINDIR
                 mkdir -p $LOCALEDIR/ru/LC_MESSAGES
-                mv $NAME.mo $LOCALEDIR/ru/LC_MESSAGES/;;
+                mv $NAME.mo $LOCALEDIR/ru/LC_MESSAGES;;
         pot) xgettext -k="_" -f "po/POTFILES.in" -D "src" -o po/$NAME.pot;;
         mo)
                 mkdir -p $LOCALEDIR/ru/LC_MESSAGES
