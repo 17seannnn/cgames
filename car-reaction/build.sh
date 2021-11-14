@@ -12,7 +12,7 @@ fi
 
 case $1 in
         install)
-                $CC -ansi -pedantic -Wall -Og -g -lcursesw src/main.c -o $NAME
+                $CC -ansi -pedantic -Wall -Og -g -lncursesw src/main.c -o $NAME
                 msgfmt po/ru.po -o $NAME.mo
                 mv -f $NAME $BINDIR
                 mkdir -p $LOCALEDIR/ru/LC_MESSAGES
