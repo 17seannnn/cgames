@@ -9,6 +9,9 @@
 
 #include "config.h"
 
+#define LOCALEDIR "/usr/share/locale"
+#define LOCAL_LOCALEDIR "/.local/share/locale"
+
 #define _(STR) gettext(STR)
 #define gettext_noop(STR) STR
 #define N_(STR) STR
@@ -58,8 +61,11 @@ const char win_text[] = gettext_noop("You win!");
 const char continue_text[] = gettext_noop("Continue? [y/N]");
 
 enum {
-        key_escape         = 27,
-        car_pair           = 1,
+        buffer_size = 1024,
+
+        key_escape = 27,
+
+        car_pair = 1,
         barrier_pair
 };
 
@@ -82,10 +88,23 @@ int rrand(int max)
 
 void initgettext()
 {
+        FILE *f;
+        char filepath[buffer_size];
+        char localepath[buffer_size];
         setlocale(LC_CTYPE, "");
         setlocale(LC_MESSAGES, "");
-        bindtextdomain(TEXTDOMAIN, LOCALEDIR);
-        textdomain(TEXTDOMAIN);
+        strncpy(filepath, getenv("HOME"), buffer_size);
+        strncat(filepath, LOCAL_LOCALEDIR"/ru/LC_MESSAGES/"PROGRAM_NAME".mo",                   buffer_size-1);
+        strncpy(localepath, getenv("HOME"), buffer_size);
+        strncat(localepath, LOCAL_LOCALEDIR, buffer_size-1);
+        f = fopen(filepath, "r");
+        if (f) {
+                bindtextdomain(PROGRAM_NAME, localepath);
+                fclose(f);
+        } else {
+                bindtextdomain(PROGRAM_NAME, LOCALEDIR);
+        }
+        textdomain(PROGRAM_NAME);
 }
 
 void show_help()
