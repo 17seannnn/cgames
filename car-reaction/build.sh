@@ -3,7 +3,7 @@
 CC=gcc
 NAME=cr
 if sudo -v 2> /dev/null; then
-        BINDIR=/usr/local/bin
+        BINDIR=/usr/bin
         LOCALEDIR=/usr/share/locale/
 else
         BINDIR=~/.local/bin
