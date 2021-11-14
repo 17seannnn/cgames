@@ -19,7 +19,7 @@
 #define PROGRAM_NAME "cr"
 #define PACKAGE_NAME "cgames"
 #define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
-#define VERSION "1.70"
+#define VERSION "2.00"
 
 #define LICENSE "GPLv3"
 #define LICENSE_PAGE "https://gnu.org/licenses/gpl.html"
