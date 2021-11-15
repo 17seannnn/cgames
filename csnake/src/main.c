@@ -371,8 +371,7 @@ void show_snake(struct tail *s)
                 mvaddch(s->cur_y, s->cur_x, s->dy < 0 ? up_symb : down_symb);
         else
                 mvaddch(s->cur_y, s->cur_x, standing_symb);
-        s = s->prev;
-        for (; s; s = s->prev)
+        for (s = s->prev; s; s = s->prev)
                 mvaddch(s->cur_y, s->cur_x, s->dx ? hor_symb : ver_symb);
         attroff(COLOR_PAIR(snake_pair));
         refresh();
@@ -490,13 +489,14 @@ void handle_resize(struct map *m,
                    struct bonus *b)
 {
         int diff_x, diff_y;
+        struct tail *t;
         struct map old = *m;
         initmap(m);
         diff_x = m->min_x - old.min_x;
         diff_y = m->min_y - old.min_y;
-        for (; s; s = s->prev) {
-                s->cur_x += diff_x;
-                s->cur_y += diff_y;
+        for (t = s; t; t = t->prev) {
+                t->cur_x += diff_x;
+                t->cur_y += diff_y;
         }
         a->cur_x += diff_x;
         a->cur_y += diff_y;
@@ -533,6 +533,7 @@ void playgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
                         break;
                 case KEY_RESIZE:
                         handle_resize(m, *s, a, b);
+                        set_direction(*s, (*s)->dx, (*s)->dy);
                         break;
                 default:
                         set_direction(*s, (*s)->dx, (*s)->dy);
