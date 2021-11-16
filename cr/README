@@ -16,6 +16,7 @@ Options
 -h, --help      show help
 -v, --version   show version
 
-Build
+Install
 
-./build.sh
+./build.sh install
+cr

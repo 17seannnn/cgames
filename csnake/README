@@ -1,4 +1,4 @@
-Csnake
+csnake
 ======
 Snake game on C language
 
@@ -17,4 +17,5 @@ Options
 
 Build
 
-./build.sh
+./build.sh install
+csnake
