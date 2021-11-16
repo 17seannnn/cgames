@@ -7,8 +7,6 @@
 #include <time.h>
 #include <curses.h>
 
-#include "config.h"
-
 #define LOCALEDIR "/usr/share/locale"
 #define LOCAL_LOCALEDIR "/.local/share/locale"
 
