@@ -1,4 +1,12 @@
-cgames 2
-========
+cgames
+======
 
 My collection of games written on C
+
+Install
+```
+git clone https://github.com/17seannnn/cgames.git
+cd cgames
+./build.sh
+cgames
+```
