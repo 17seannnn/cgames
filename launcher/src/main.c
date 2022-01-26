@@ -1,29 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <curses.h>
 #include <locale.h>
 #include <libintl.h>
 
-#define TEXTDOMAIN "mmtest"
+#define TEXTDOMAIN "cgames"
 #define LOCALEDIR "/usr/share/locale"
 #define LOCAL_LOCALEDIR ".local/share/locale"
+#define LOCALEFILE_PATH "ru/LC_MESSAGES"
 
 #define _(STR) gettext(STR)
-#define _N(STR) STR
+#define N_(STR) STR
 #define gettext_noop(STR) STR
 
 #include "mainmenu.h"
 
 enum {
+        bufsize = 1024,
+
         cr = 0,
         csnake
 };
 
-const char  pn[]             = gettext_noop("Test");
+const char  pn[]             = "cgames";
 const char  fn[]             = ".cgames";
 const char  mt[][mm_bufsize] = { 
-                                 gettext_noop("car reaction"),
-                                 gettext_noop("csnake"),
+                                 N_("car reaction"),
+                                 N_("csnake"),
                                  gettext_noop("Exit")
 };
 const char  st[1][mm_bufsize];
@@ -40,9 +44,23 @@ const int settings_menu = 0;
 
 static void initgettext()
 {
+        char localdir[bufsize], localfile[bufsize];
+        FILE *f;
         setlocale(LC_CTYPE, "");
         setlocale(LC_MESSAGES, "");
-        bindtextdomain(TEXTDOMAIN, LOCALEDIR);
+        strncpy(localdir, getenv("HOME"), bufsize);
+        strncat(localdir, "/", bufsize-1);
+        strncat(localdir, LOCAL_LOCALEDIR, bufsize-1);
+        strncpy(localfile, localdir, bufsize);
+        strncat(localfile, "/", bufsize-1);
+        strncat(localfile, LOCALEFILE_PATH, bufsize-1);
+        f = fopen(localfile, "r");
+        if (f) {
+                fclose(f);
+                bindtextdomain(TEXTDOMAIN, localdir);
+        } else {
+                bindtextdomain(TEXTDOMAIN, LOCALEDIR);
+        }
         textdomain(TEXTDOMAIN);
 }
 
@@ -54,6 +72,8 @@ static void mainmenu_handle(int res)
                 break;
         case csnake:
                 system("csnake");
+                break;
+        default:
                 break;
         }
 }

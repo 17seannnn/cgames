@@ -14,7 +14,8 @@ case $1 in
         install)
                 cd src
                 $CC -ansi -pedantic -Wall -Og -g -lncursesw -c mainmenu.c
-                $CC -ansi -pedantic -Wall -Og -g -lncursesw mainmenu.o main.c -o $NAME
+                $CC -ansi -pedantic -Wall -Og -g -lncursesw mainmenu.o main.c -o ../$NAME
+                cd ..
                 msgfmt po/ru.po -o $NAME.mo
                 mkdir -p $BINDIR
                 mv -f $NAME $BINDIR
