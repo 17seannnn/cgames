@@ -1,4 +1,4 @@
-# 
+#
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 21:54+0300\n"
+"POT-Creation-Date: 2022-01-26 22:19+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -18,3 +18,45 @@ msgstr ""
 #: main.c:31
 msgid "Exit"
 msgstr "Выйти"
+
+#: main.c:54
+msgid "Sergey Nikonov"
+msgstr "Сергей Никонов"
+
+#: main.c:63
+#, c-format
+msgid ""
+"Usage: %s [-OPT/--OPT] file1 file2...\n"
+"\n"
+"Options\n"
+"\n"
+"%s, %s      show help\n"
+"%s, %s   show version\n"
+"\n"
+"Report bugs to & %s home page: <%s>\n"
+msgstr ""
+"Использование: %s [-ОПЦ/--ОПЦ] файл1 файл2...\n"
+"\n"
+"Опции\n"
+"\n"
+"%s, %s      показать помощь\n"
+"%s, %s   показать версию\n"
+"\n"
+"Сообщить о баге & домашняя страница %s: <%s>\n"
+
+#: main.c:73
+#, c-format
+msgid ""
+"%s (%s) %s\n"
+"Copyright (C) %s %s (%s)\n"
+"License %s: <%s>\n"
+"\n"
+"Written by %s (%s).\n"
+"Github: <%s>\n"
+msgstr ""
+"%s (%s) %s\n"
+"Авторское право (C) %s %s (%s)\n"
+"Лицензия %s: <%s>\n"
+"\n"
+"Написал %s (%s).\n"
+"Github: <%s>\n"

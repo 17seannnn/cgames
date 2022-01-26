@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 21:54+0300\n"
+"POT-Creation-Date: 2022-01-26 22:19+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,4 +19,32 @@ msgstr ""
 
 #: main.c:31
 msgid "Exit"
+msgstr ""
+
+#: main.c:54
+msgid "Sergey Nikonov"
+msgstr ""
+
+#: main.c:63
+#, c-format
+msgid ""
+"Usage: %s [-OPT/--OPT] file1 file2...\n"
+"\n"
+"Options\n"
+"\n"
+"%s, %s      show help\n"
+"%s, %s   show version\n"
+"\n"
+"Report bugs to & %s home page: <%s>\n"
+msgstr ""
+
+#: main.c:73
+#, c-format
+msgid ""
+"%s (%s) %s\n"
+"Copyright (C) %s %s (%s)\n"
+"License %s: <%s>\n"
+"\n"
+"Written by %s (%s).\n"
+"Github: <%s>\n"
 msgstr ""
