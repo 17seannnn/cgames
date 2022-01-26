@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <curses.h>
 #include <locale.h>
 #include <libintl.h>
@@ -12,6 +13,11 @@
 #define gettext_noop(STR) STR
 
 #include "mainmenu.h"
+
+enum {
+        cr = 0,
+        csnake
+};
 
 const char  pn[]             = gettext_noop("Test");
 const char  fn[]             = ".cgames";
@@ -40,27 +46,29 @@ static void initgettext()
         textdomain(TEXTDOMAIN);
 }
 
-static void initcurses()
+static void mainmenu_handle(int res)
 {
-        noecho();
-        cbreak();
-        if (has_colors())
-                start_color();
-        keypad(stdscr, 1);
-        curs_set(1);
+        switch (res) {
+        case cr:
+                system("cr");
+                break;
+        case csnake:
+                system("csnake");
+                break;
+        }
 }
 
 int main()
 {
         int res;
         initgettext();
-        initscr();
         for (;;) {
+                initscr();
                 res = mainmenu();
-                initcurses();
+                endwin();
                 if (res == exit_choise)
                         break;
+                mainmenu_handle(res);
         }
-        endwin();
-        return 1;
+        return 0;
 }
