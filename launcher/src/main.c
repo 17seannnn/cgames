@@ -84,12 +84,18 @@ static void initgettext()
         FILE *f;
         setlocale(LC_CTYPE, "");
         setlocale(LC_MESSAGES, "");
+
         strncpy(localdir, getenv("HOME"), bufsize);
         strncat(localdir, "/", bufsize-1);
         strncat(localdir, LOCAL_LOCALEDIR, bufsize-1);
+
         strncpy(localfile, localdir, bufsize);
         strncat(localfile, "/", bufsize-1);
         strncat(localfile, LOCALEFILE_PATH, bufsize-1);
+        strncat(localfile, "/", bufsize-1);
+        strncat(localfile, program_name_long, bufsize-1);
+        strncat(localfile, ".mo", bufsize-1);
+
         f = fopen(localfile, "r");
         if (f) {
                 fclose(f);
