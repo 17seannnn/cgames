@@ -19,18 +19,12 @@ case $1 in
                 mkdir -p $LOCALEDIR/ru/LC_MESSAGES
                 mv $NAME.mo $LOCALEDIR/ru/LC_MESSAGES;;
         pot) xgettext -k="_" -f "po/POTFILES.in" -D "src" -o po/$NAME.pot;;
-        mo)
-                mkdir -p $LOCALEDIR/ru/LC_MESSAGES
-                msgfmt po/ru.po -o $LOCALEDIR/ru/LC_MESSAGES/$NAME.mo;;
         * | --help) echo "\
 Usage:
-build.sh [COMMAND/--OPTION]
-
-Options:
-        --help     this help
+build.sh [CMD]
 
 Commands:
         install    install this program
         pot        generate .pot file in po/
-        mo         compile and move .mo files from po/ to locale dir";;
+        help       show help";;
 esac
