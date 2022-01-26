@@ -119,7 +119,7 @@ static void show_version()
         printf(_(version_text), program_name, program_name_long, version,
                                 copyright_year, _(author), author_nickname,
                                 license, license_page,
-                                author, author_nickname,
+                                _(author), author_nickname,
                                 author_page);
 }
 
