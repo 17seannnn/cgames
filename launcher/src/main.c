@@ -5,6 +5,8 @@
 #include <locale.h>
 #include <libintl.h>
 
+#include "mainmenu.h"
+
 #define TEXTDOMAIN "cgames"
 #define LOCALEDIR "/usr/share/locale"
 #define LOCAL_LOCALEDIR ".local/share/locale"
@@ -13,8 +15,6 @@
 #define _(STR) gettext(STR)
 #define N_(STR) STR
 #define gettext_noop(STR) STR
-
-#include "mainmenu.h"
 
 enum {
         bufsize = 1024,
@@ -61,7 +61,7 @@ static const char version_opt_short[] = N_("-V");
 static const char version_opt_long[]  = N_("--version");
 
 static const char help_text[] = gettext_noop("\
-Usage: %s [-OPT/--OPT] file1 file2...\n\
+Usage: %s [-OPT/--OPT]\n\
 \n\
 Options\n\
 \n\
@@ -111,7 +111,7 @@ static void show_help()
         printf(_(help_text), program_name,
                              help_opt_short, help_opt_long,
                              version_opt_short, version_opt_long,
-                             program_name, program_page);
+                             program_name_long, program_page);
 }
 
 static void show_version()
