@@ -274,7 +274,8 @@ static void draw_screen(struct map m, struct car c, struct barrier *b, int n)
         show_barrier(b, n);
 }
 
-static void handle_resize(struct map *m, struct car *c, struct barrier *b, int n)
+static void handle_resize(struct map *m, struct car *c, struct barrier *b,
+                                                        int n)
 {
         int i;
         initmap(m);
