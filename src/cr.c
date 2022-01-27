@@ -1,62 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <locale.h>
 #include <libintl.h>
 #include <unistd.h>
 #include <time.h>
 #include <curses.h>
 
-#define LOCALEDIR "/usr/share/locale"
-#define LOCAL_LOCALEDIR "/.local/share/locale"
-
 #define _(STR) gettext(STR)
 #define gettext_noop(STR) STR
 #define N_(STR) STR
 
-#define PROGRAM_NAME "cr"
-#define PACKAGE_NAME "cgames"
-#define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
-#define VERSION "2.00"
-
-#define LICENSE "GPLv3"
-#define LICENSE_PAGE "https://gnu.org/licenses/gpl.html"
-#define COPYRIGHT_YEAR "2021"
-
-#define AUTHOR "Sergey S. Nikonov"
-#define AUTHOR_NICKNAME "17seannnn"
-#define AUTHOR_PAGE "https://github.com/17seannnn"
-
-#define HELP_SHORT_OPT "-h"
-#define HELP_LONG_OPT "--help"
-#define VERSION_SHORT_OPT "-v"
-#define VERSION_LONG_OPT "--version"
-
-const char help_text[] = gettext_noop("\
-Usage: %s [-OPT/--OPT]\n\
-\n\
-Options\n\
-\n\
--h, --help      show help\n\
--v, --version   show version\n\
-\n\
-Movement\n\
-\n\
-'left arrow' and 'right arrow' or\n\
-'A','a' and 'D', 'd'\n\
-\n\
-Report bugs to & %s home page: <%s>\n");
-
-const char version_text[] = gettext_noop("\
-%s (%s) %s\n\
-Copyright (c) %s %s (%s)\n\
-License %s: <%s>\n\
-\n\
-Written by %s (%s).\n\
-Github: <%s>\n");
-
-const char win_text[] = gettext_noop("You win!");
-const char continue_text[] = gettext_noop("Continue? [y/N]");
+static const char win_text[] = gettext_noop("You win!");
+static const char continue_text[] = gettext_noop("Continue? [y/N]");
 
 enum {
         buffer_size = 1024,
@@ -102,83 +57,30 @@ struct barrier {
         int cur_x, cur_y, step;
 };
 
-int rrand(int max)
+static int rrand(int max)
 {
         return (int)((double)max*rand()/(RAND_MAX+1.0));
 }
 
-void initgettext()
+static void initcolors()
 {
-        FILE *f;
-        char filepath[buffer_size];
-        char localepath[buffer_size];
-        setlocale(LC_CTYPE, "");
-        setlocale(LC_MESSAGES, "");
-        strncpy(filepath, getenv("HOME"), buffer_size);
-        strncat(filepath, LOCAL_LOCALEDIR"/ru/LC_MESSAGES/"PROGRAM_NAME".mo",                   buffer_size-1);
-        strncpy(localepath, getenv("HOME"), buffer_size);
-        strncat(localepath, LOCAL_LOCALEDIR, buffer_size-1);
-        f = fopen(filepath, "r");
-        if (f) {
-                bindtextdomain(PROGRAM_NAME, localepath);
-                fclose(f);
-        } else {
-                bindtextdomain(PROGRAM_NAME, LOCALEDIR);
-        }
-        textdomain(PROGRAM_NAME);
+        init_pair(car_pair, car_font_color, car_bg_color);
+        init_pair(barrier_pair, barrier_font_color, barrier_bg_color);
 }
 
-void show_help()
-{
-        printf(_(help_text), PROGRAM_NAME, PACKAGE_NAME, PACKAGE_PAGE);
-}
-
-void show_version()
-{
-        printf(_(version_text),
-               PROGRAM_NAME, PACKAGE_NAME, VERSION,
-               COPYRIGHT_YEAR, AUTHOR, AUTHOR_NICKNAME,
-               LICENSE, LICENSE_PAGE,
-               AUTHOR, AUTHOR_NICKNAME,
-               AUTHOR_PAGE);
-}
-
-int handle_opt(char **argv)
-{
-        argv++;
-        for (; *argv; argv++) {
-                if (0 == strcmp(*argv, HELP_SHORT_OPT) ||
-                    0 == strcmp(*argv, HELP_LONG_OPT)) {
-                        show_help();
-                        return 0;
-                }
-                if (0 == strcmp(*argv, VERSION_SHORT_OPT) ||
-                    0 == strcmp(*argv, VERSION_LONG_OPT)) {
-                        show_version();
-                        return 0;
-                } 
-        }
-                return 1;
-}
-
-void initcurses()
+static void initcurses()
 {
         initscr();
         if (has_colors())
                 start_color();
+        initcolors();
         cbreak();
         noecho();
         curs_set(0);
         keypad(stdscr, 1);
 }
 
-void initcolors()
-{
-        init_pair(car_pair, car_font_color, car_bg_color);
-        init_pair(barrier_pair, barrier_font_color, barrier_bg_color);
-}
-
-void initmap(struct map *m)
+static void initmap(struct map *m)
 {
         int row, col;
         getmaxyx(stdscr, row, col);
@@ -190,7 +92,7 @@ void initmap(struct map *m)
         m->max_y = m->min_y + m->h - 1;
 }
 
-void initcar(struct car *c, int pos, int score, struct map m)
+static void initcar(struct car *c, int pos, int score, struct map m)
 {
         c->cur_x = m.min_x + road_width * pos + pos-1 - road_width/2;
         c->cur_y = m.max_y - m.h/5;
@@ -198,7 +100,7 @@ void initcar(struct car *c, int pos, int score, struct map m)
         c->score = score;
 }
 
-void check_barrier(struct barrier *b, int n)
+static void check_barrier(struct barrier *b, int n)
 {
         int i;
         for (i = 0; i < n; i++) {
@@ -217,7 +119,7 @@ void check_barrier(struct barrier *b, int n)
         b[0].step -= 3;
 }
 
-void initbarrier(struct barrier *b, int n, int save, struct map m)
+static void initbarrier(struct barrier *b, int n, int save, struct map m)
 {
         if (save) {
                 b->cur_x = m.min_x+1 + road_width*n;
@@ -229,7 +131,7 @@ void initbarrier(struct barrier *b, int n, int save, struct map m)
         }
 }
 
-void initgame(struct map *m, struct car *c, struct barrier *b, int n)
+static void initgame(struct map *m, struct car *c, struct barrier *b, int n)
 {
         int i;
         srand(time(NULL));
@@ -241,7 +143,7 @@ void initgame(struct map *m, struct car *c, struct barrier *b, int n)
         check_barrier(b, n);
 }
 
-void show_map(struct map m)
+static void show_map(struct map m)
 {
         int y;
         for (y = m.min_y; y <= m.max_y; y++) {
@@ -251,12 +153,12 @@ void show_map(struct map m)
         refresh();
 }
 
-void show_score(int score, int y, int x)
+static void show_score(int score, int y, int x)
 {
         mvprintw(y, x, N_("%d"), score);
 }
 
-void show_road(struct map m, int score)
+static void show_road(struct map m, int score)
 {
         int x, y, pos;
         for (y = m.min_y; y <= m.max_y; y++) {
@@ -269,19 +171,19 @@ void show_road(struct map m, int score)
         refresh();
 }
 
-void show_car(struct car c)
+static void show_car(struct car c)
 {
         mvaddch(c.cur_y, c.cur_x, car_symbol | COLOR_PAIR(car_pair));
         refresh();
 }
 
-void hide_car(struct car c)
+static void hide_car(struct car c)
 {
         mvaddch(c.cur_y, c.cur_x, ' ');
         refresh();
 }
 
-void move_car(struct car *c, int dpos)
+static void move_car(struct car *c, int dpos)
 {
         int pos;
         hide_car(*c);
@@ -298,7 +200,7 @@ void move_car(struct car *c, int dpos)
         show_car(*c);
 }
 
-void show_barrier(struct barrier *b, int n)
+static void show_barrier(struct barrier *b, int n)
 {
         int i, j;
         for (i = 0; i < n; i++) {
@@ -311,7 +213,7 @@ void show_barrier(struct barrier *b, int n)
         refresh();
 }
 
-void hide_barrier(struct barrier *b, int n)
+static void hide_barrier(struct barrier *b, int n)
 {
         int i, j;
         for (i = 0; i < n; i++) {
@@ -324,7 +226,7 @@ void hide_barrier(struct barrier *b, int n)
         refresh();
 }
 
-void move_barrier(struct barrier *b, int n, struct map m)
+static void move_barrier(struct barrier *b, int n, struct map m)
 {
         int i;
         hide_barrier(b, n);
@@ -340,7 +242,7 @@ void move_barrier(struct barrier *b, int n, struct map m)
         show_barrier(b, n);
 }
 
-int check_collision(struct car c, struct barrier *b, int n)
+static int check_collision(struct car c, struct barrier *b, int n)
 {
         int i;
         for (i = 0; i < n; i++)
@@ -352,7 +254,7 @@ int check_collision(struct car c, struct barrier *b, int n)
         return 0;
 }
 
-void speedup(int score)
+static void speedup(int score)
 {
         int speed = max_speed - 5 * (score / (max_score/100));
         if (speed < min_speed)
@@ -361,7 +263,7 @@ void speedup(int score)
         timeout(speed);
 }
 
-void draw_screen(struct map m, struct car c, struct barrier *b, int n)
+static void draw_screen(struct map m, struct car c, struct barrier *b, int n)
 {
         clear();
         show_map(m);
@@ -370,7 +272,7 @@ void draw_screen(struct map m, struct car c, struct barrier *b, int n)
         show_barrier(b, n);
 }
 
-void handle_resize(struct map *m, struct car *c, struct barrier *b, int n)
+static void handle_resize(struct map *m, struct car *c, struct barrier *b, int n)
 {
         int i;
         initmap(m);
@@ -381,7 +283,7 @@ void handle_resize(struct map *m, struct car *c, struct barrier *b, int n)
         draw_screen(*m, *c, b, n);
 }
 
-void playgame(struct map *m, struct car *c, struct barrier *b, int n)
+static void playgame(struct map *m, struct car *c, struct barrier *b, int n)
 {
         int res, key;
         while ((key = getch()) != key_escape) {
@@ -413,7 +315,7 @@ void playgame(struct map *m, struct car *c, struct barrier *b, int n)
         }
 }
 
-void endgame(int score)
+static void endgame(int score)
 {
         int x, y;
         sleep(1);
@@ -426,7 +328,7 @@ void endgame(int score)
         refresh();
 }
 
-int ask_continue()
+static int ask_continue()
 {
         int y, x, key, ans = 'N';
         getmaxyx(stdscr, y, x);
@@ -447,16 +349,12 @@ int ask_continue()
         return 0;
 }
 
-int main(int argc, char **argv)
+void cr()
 {
         struct map m;
         struct car c;
         struct barrier b[barrier_count];
-        initgettext();
-        if (!handle_opt(argv))
-                return 0;
         initcurses();
-        initcolors();
         do {
                 initgame(&m, &c, b, barrier_count);
                 draw_screen(m, c, b, barrier_count);
@@ -464,5 +362,4 @@ int main(int argc, char **argv)
                 endgame(c.score);
         } while (ask_continue());
         endwin();
-        return 0;
 }
