@@ -10,3 +10,26 @@ cd cgames
 ./build.sh
 cgames
 ```
+
+Information about games
+
+Car Reaction
+------------
+Arcade game to train your reaction
+
+Movement
+
+Arrows
+AD
+
+csnake
+------
+Snake game on C language
+
+Movement
+
+Arrows
+WASD
+HJKL
+
+Esc - leave the game
