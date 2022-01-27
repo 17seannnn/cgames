@@ -6,6 +6,8 @@
 #include <time.h>
 #include <curses.h>
 
+#include "cgames.h"
+
 #define _(STR) gettext(STR)
 #define gettext_noop(STR) STR
 #define N_(STR) (STR)
