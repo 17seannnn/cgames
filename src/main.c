@@ -6,6 +6,7 @@
 #include <libintl.h>
 
 #include "mainmenu.h"
+#include "cgames.h"
 
 #define TEXTDOMAIN "cgames"
 #define LOCALEDIR "/usr/share/locale"
@@ -19,8 +20,8 @@
 enum {
         bufsize = 1024,
 
-        cr = 0,
-        csnake
+        game_cr = 0,
+        game_csnake
 };
 
 const char  pn[]             = "cgames";
@@ -144,11 +145,10 @@ static int handle_opt(const char **argv)
 static void mainmenu_handle(int res)
 {
         switch (res) {
-        case cr:
-                system("cr");
+        case game_cr:
+                cr();
                 break;
-        case csnake:
-                system("csnake");
+        case game_csnake:
                 break;
         default:
                 break;
