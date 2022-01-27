@@ -46,7 +46,7 @@ const int settings_menu = 0;
 static const char program_name[]      = N_("launcher");
 static const char program_name_long[] = N_("cgames");
 static const char program_page[]      = N_("https://github.com/17seannnn/cgames");
-static const char version[]           = N_("3");
+static const char version[]           = N_("4");
 
 static const char copyright_year[] = N_("2021");
 static const char license[]        = N_("GPLv3");
