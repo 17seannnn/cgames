@@ -124,7 +124,8 @@ static int is_bonus(int x, int y, struct bonus b)
         return 0;
 }
 
-static int has_empty(struct map m, struct tail *s, struct apple a, struct bonus b)
+static int has_empty(struct map m, struct tail *s, struct apple a, 
+                                                   struct bonus b)
 {
         int x, y;
         for (y = m.min_y + 1; y < m.max_y; y++)
@@ -201,7 +202,8 @@ static void initapple(struct apple *a, struct tail *s, struct map m)
         a->cur_y = y;
 }
 
-static void initbonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
+static void initbonus(struct bonus *b, struct tail *s, struct apple a,
+                                                       struct map m)
 {
         int x, y;
         if (!has_empty(m, s, a, *b)) {
@@ -223,7 +225,8 @@ static void initbonus(struct bonus *b, struct tail *s, struct apple a, struct ma
         b->status = bonus_off;
 }
 
-static void initgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
+static void initgame(struct map *m, struct tail **s, struct apple *a,
+                                                     struct bonus *b)
 {
         srand(time(NULL));
         timeout(delay_duration);
@@ -308,7 +311,8 @@ static void show_apple(struct apple a)
         refresh();
 }
 
-static void move_apple(struct apple *a, struct tail *s, struct bonus *b, struct map m)
+static void move_apple(struct apple *a, struct tail *s, struct bonus *b,
+                                                        struct map m)
 {
         initapple(a, s, m);
         show_apple(*a);
@@ -320,13 +324,15 @@ static void show_bonus(struct bonus b)
         refresh();
 }
 
-static void move_bonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
+static void move_bonus(struct bonus *b, struct tail *s, struct apple a,
+                                                        struct map m)
 {
         initbonus(b, s, a, m);
         show_bonus(*b);
 }
 
-static void handle_bonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
+static void handle_bonus(struct bonus *b, struct tail *s, struct apple a,
+                                                          struct map m)
 {
         switch (b->status) {
         case bonus_end:
@@ -363,7 +369,8 @@ static void show_info(int steps, int score)
         refresh();
 }
 
-static void draw_screen(struct map m, struct tail *s, struct apple a, struct bonus b)
+static void draw_screen(struct map m, struct tail *s, struct apple a,
+                                                      struct bonus b)
 {
         clear();
         show_map(m);
@@ -373,9 +380,9 @@ static void draw_screen(struct map m, struct tail *s, struct apple a, struct bon
 }
 
 static void handle_resize(struct map *m,
-                   struct tail *s,
-                   struct apple *a,
-                   struct bonus *b)
+                          struct tail *s,
+                          struct apple *a,
+                          struct bonus *b)
 {
         int diff_x, diff_y;
         struct tail *t;
@@ -394,7 +401,8 @@ static void handle_resize(struct map *m,
         draw_screen(*m, s, *a, *b);
 }
 
-static void playgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
+static void playgame(struct map *m, struct tail **s, struct apple *a,
+                                                     struct bonus *b)
 {
         int key, res;
         while ((key = getch()) != key_escape) {
