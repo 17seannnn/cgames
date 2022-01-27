@@ -292,11 +292,15 @@ static void playgame(struct map *m, struct car *c, struct barrier *b, int n)
                 show_score(c->score, 0, 0);
                 switch (key) {
                 case KEY_LEFT:
+                case 'H':
+                case 'h':
                 case 'A':
                 case 'a':
                         move_car(c, -1);
                         break;
                 case KEY_RIGHT:
+                case 'L':
+                case 'l':
                 case 'D':
                 case 'd':
                         move_car(c, 1);
