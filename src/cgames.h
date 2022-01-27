@@ -2,5 +2,6 @@
 #define CGAMES_H
 
 void cr();
+void csnake();
 
 #endif

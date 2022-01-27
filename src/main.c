@@ -149,6 +149,7 @@ static void mainmenu_handle(int res)
                 cr();
                 break;
         case game_csnake:
+                csnake();
                 break;
         default:
                 break;

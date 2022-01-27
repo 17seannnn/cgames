@@ -1,62 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <locale.h>
 #include <libintl.h>
 #include <unistd.h>
 #include <time.h>
 #include <curses.h>
 
-#define LOCALEDIR "/usr/share/locale"
-#define LOCAL_LOCALEDIR "/.local/share/locale"
-
 #define _(STR) gettext(STR)
 #define gettext_noop(STR) STR
 #define N_(STR) (STR)
-
-#define PROGRAM_NAME "csnake"
-#define PACKAGE_NAME "cgames"
-#define PACKAGE_PAGE "https://github.com/17seannnn/cgames"
-#define VERSION "1.00"
-
-#define LICENSE "GPLv3"
-#define LICENSE_PAGE "https://gnu.org/licenses/gpl.html"
-#define COPYRIGHT_YEAR "2021"
-
-#define AUTHOR "Sergey S. Nikonov"
-#define AUTHOR_NICKNAME "17seannnn"
-#define AUTHOR_PAGE "https://github.com/17seannnn"
-
-#define HELP_SHORT_OPT "-h"
-#define HELP_LONG_OPT "--help"
-#define VERSION_SHORT_OPT "-v"
-#define VERSION_LONG_OPT "--version"
-
-static const char help_text[] = gettext_noop("\
-Usage: %s [-OPT/--OPT]\n\
-\n\
-Options\n\
-\n\
--h, --help      show help\n\
--v, --version   show version\n\
-\n\
-Movement\n\
-\n\
-Arrows or\n\
-WASD   or\n\
-HJKL\n\
-\n\
-Esc - leave the game\n\
-\n\
-Report bugs to & %s home page: <%s>\n");
-
-static const char version_text[] = gettext_noop("\
-%s (%s) %s\n\
-Copyright (C) %s %s (%s)\n\
-License %s: <%s>\n\
-\n\
-Written by %s (%s).\n\
-Github: <%s>\n");
 
 static const char win_text[] = gettext_noop("You win!");
 static const char continue_text[] = gettext_noop("Continue? [y/N]");
@@ -123,66 +75,12 @@ struct bonus {
         double effect;
 };
 
-int rrand(int max)
+static int rrand(int max)
 {
         return (int)((double)max*rand()/(RAND_MAX+1.0));
 }
 
-int intlen(int i)
-{
-        int l = 0;
-        do {
-                i /= 10;
-                l++;
-        } while (i);
-        return l;
-}
-
-void show_help()
-{
-        printf(_(help_text), PROGRAM_NAME, PACKAGE_NAME, PACKAGE_PAGE);
-}
-
-void show_version()
-{
-        printf(_(version_text),
-               PROGRAM_NAME, PACKAGE_NAME, VERSION,
-               COPYRIGHT_YEAR, AUTHOR, AUTHOR_NICKNAME,
-               LICENSE, LICENSE_PAGE,
-               AUTHOR, AUTHOR_NICKNAME,
-               AUTHOR_PAGE);
-}
-
-int handle_opt(char **argv)
-{
-        argv++;
-        for (; *argv; argv++) {
-                if (0 == strcmp(*argv, HELP_SHORT_OPT) ||
-                    0 == strcmp(*argv, HELP_LONG_OPT)) {
-                        show_help();
-                        return 0;
-                }
-                if (0 == strcmp(*argv, VERSION_SHORT_OPT) ||
-                    0 == strcmp(*argv, VERSION_LONG_OPT)) {
-                        show_version();
-                        return 0;
-                } 
-        }
-                return 1;
-}
-
-void initcurses()
-{
-        initscr();
-        if (has_colors())
-                start_color();
-        cbreak();
-        noecho();
-        curs_set(0);
-        keypad(stdscr, 1);
-}
-
-void initcolors()
+static void initcolors()
 {
         init_pair(map_pair, map_color, bg_color);
         init_pair(snake_pair, snake_color, bg_color);
@@ -190,28 +88,19 @@ void initcolors()
         init_pair(bonus_pair, bonus_color, bg_color);
 }
 
-void initgettext()
+static void initcurses()
 {
-        FILE *f;
-        char filepath[buffer_size];
-        char localepath[buffer_size];
-        setlocale(LC_CTYPE, "");
-        setlocale(LC_MESSAGES, "");
-        strncpy(filepath, getenv("HOME"), buffer_size);
-        strncat(filepath, LOCAL_LOCALEDIR"/ru/LC_MESSAGES/"PROGRAM_NAME".mo",                   buffer_size-1);
-        strncpy(localepath, getenv("HOME"), buffer_size);
-        strncat(localepath, LOCAL_LOCALEDIR, buffer_size-1);
-        f = fopen(filepath, "r");
-        if (f) {
-                bindtextdomain(PROGRAM_NAME, localepath);
-                fclose(f);
-        } else {
-                bindtextdomain(PROGRAM_NAME, LOCALEDIR);
-        }
-        textdomain(PROGRAM_NAME);
+        initscr();
+        if (has_colors())
+                start_color();
+        initcolors();
+        cbreak();
+        noecho();
+        curs_set(0);
+        keypad(stdscr, 1);
 }
 
-int is_tail(int x, int y, struct tail *s)
+static int is_tail(int x, int y, struct tail *s)
 {
         for (; s; s = s->prev)
                 if (x == s->cur_x && y == s->cur_y)
@@ -219,21 +108,21 @@ int is_tail(int x, int y, struct tail *s)
         return 0;
 }
 
-int is_apple(int x, int y, struct apple a)
+static int is_apple(int x, int y, struct apple a)
 {
         if (x == a.cur_x && y == a.cur_y)
                 return 1;
         return 0;
 }
 
-int is_bonus(int x, int y, struct bonus b)
+static int is_bonus(int x, int y, struct bonus b)
 {
         if (x == b.cur_x && y == b.cur_y)
                 return 1;
         return 0;
 }
 
-int has_empty(struct map m, struct tail *s, struct apple a, struct bonus b)
+static int has_empty(struct map m, struct tail *s, struct apple a, struct bonus b)
 {
         int x, y;
         for (y = m.min_y + 1; y < m.max_y; y++)
@@ -245,7 +134,7 @@ int has_empty(struct map m, struct tail *s, struct apple a, struct bonus b)
         return 0;
 }
 
-void check(int *coord, int min, int max)
+static void check(int *coord, int min, int max)
 {
         if (*coord < min)
                 *coord = max;
@@ -253,7 +142,7 @@ void check(int *coord, int min, int max)
                 *coord = min;
 }
 
-void initmap(struct map *m)
+static void initmap(struct map *m)
 {
         int y, x;
         getmaxyx(stdscr, y, x);
@@ -263,7 +152,7 @@ void initmap(struct map *m)
         m->max_y = m->min_y + map_height - 1;
 }
 
-void add_tail(struct tail **s, struct map m)
+static void add_tail(struct tail **s, struct map m)
 {
         struct tail *t = malloc(sizeof(*t));
         if (*s) {
@@ -288,7 +177,7 @@ void add_tail(struct tail **s, struct map m)
                 t->prev = NULL;
 }
 
-void initsnake(struct tail **s, struct map m)
+static void initsnake(struct tail **s, struct map m)
 {
         struct tail *t;
         while (*s) {
@@ -299,7 +188,7 @@ void initsnake(struct tail **s, struct map m)
         add_tail(s, m);
 }
 
-void initapple(struct apple *a, struct tail *s, struct map m)
+static void initapple(struct apple *a, struct tail *s, struct map m)
 {
         int x, y;
         do {
@@ -310,7 +199,7 @@ void initapple(struct apple *a, struct tail *s, struct map m)
         a->cur_y = y;
 }
 
-void initbonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
+static void initbonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
 {
         int x, y;
         if (!has_empty(m, s, a, *b)) {
@@ -332,7 +221,7 @@ void initbonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
         b->status = bonus_off;
 }
 
-void initgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
+static void initgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
 {
         srand(time(NULL));
         timeout(delay_duration);
@@ -342,7 +231,7 @@ void initgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
         initbonus(b, *s, *a, *m);
 }
 
-void show_map(struct map m)
+static void show_map(struct map m)
 {
         int x, y;
         attron(COLOR_PAIR(map_pair));
@@ -359,7 +248,7 @@ void show_map(struct map m)
         refresh();
 }
 
-void show_snake(struct tail *s)
+static void show_snake(struct tail *s)
 {
         attron(COLOR_PAIR(snake_pair));
         if (s->dx != 0)
@@ -375,14 +264,14 @@ void show_snake(struct tail *s)
         refresh();
 }
 
-void hide_snake(struct tail *s)
+static void hide_snake(struct tail *s)
 {
         for (; s; s = s->prev)
                 mvaddch(s->cur_y, s->cur_x, ' ');
         refresh();
 }
 
-void set_direction(struct tail *s, int dx, int dy)
+static void set_direction(struct tail *s, int dx, int dy)
 {
         if ((s->dx != 0 && s->dx == -dx) || (s->dy != 0 && s->dy == -dy))
                 return;
@@ -392,7 +281,7 @@ void set_direction(struct tail *s, int dx, int dy)
         s->dy = dy;
 }
 
-void set_coords(struct tail *s, int x, int y, struct map m)
+static void set_coords(struct tail *s, int x, int y, struct map m)
 {
         if (s->prev)
                 set_coords(s->prev, s->cur_x, s->cur_y, m);
@@ -402,7 +291,7 @@ void set_coords(struct tail *s, int x, int y, struct map m)
         check(&s->cur_y, m.min_y+1, m.max_y-1);
 }
 
-void move_snake(struct tail *s, struct map m)
+static void move_snake(struct tail *s, struct map m)
 {
         hide_snake(s);
         set_coords(s, s->cur_x + s->dx, s->cur_y + s->dy, m);
@@ -411,31 +300,31 @@ void move_snake(struct tail *s, struct map m)
                 s->steps++;
 }
 
-void show_apple(struct apple a)
+static void show_apple(struct apple a)
 {
         mvaddch(a.cur_y, a.cur_x, apple_symb | COLOR_PAIR(apple_pair));
         refresh();
 }
 
-void move_apple(struct apple *a, struct tail *s, struct bonus *b, struct map m)
+static void move_apple(struct apple *a, struct tail *s, struct bonus *b, struct map m)
 {
         initapple(a, s, m);
         show_apple(*a);
 }
 
-void show_bonus(struct bonus b)
+static void show_bonus(struct bonus b)
 {
         mvaddch(b.cur_y, b.cur_x, bonus_symb | COLOR_PAIR(bonus_pair));
         refresh();
 }
 
-void move_bonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
+static void move_bonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
 {
         initbonus(b, s, a, m);
         show_bonus(*b);
 }
 
-void handle_bonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
+static void handle_bonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
 {
         switch (b->status) {
         case bonus_end:
@@ -452,7 +341,7 @@ void handle_bonus(struct bonus *b, struct tail *s, struct apple a, struct map m)
         }
 }
 
-int check_collision(struct tail *s,
+static int check_collision(struct tail *s,
                     struct apple a,
                     struct bonus *b,
                     struct map m)
@@ -466,13 +355,13 @@ int check_collision(struct tail *s,
         return !is_tail(s->cur_x, s->cur_y, s->prev);
 }
 
-void show_info(int steps, int score)
+static void show_info(int steps, int score)
 {
         mvprintw(0, 0, N_("%d %d"), steps, score);
         refresh();
 }
 
-void draw_screen(struct map m, struct tail *s, struct apple a, struct bonus b)
+static void draw_screen(struct map m, struct tail *s, struct apple a, struct bonus b)
 {
         clear();
         show_map(m);
@@ -481,7 +370,7 @@ void draw_screen(struct map m, struct tail *s, struct apple a, struct bonus b)
         show_bonus(b);
 }
 
-void handle_resize(struct map *m,
+static void handle_resize(struct map *m,
                    struct tail *s,
                    struct apple *a,
                    struct bonus *b)
@@ -503,7 +392,7 @@ void handle_resize(struct map *m,
         draw_screen(*m, s, *a, *b);
 }
 
-void playgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
+static void playgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
 {
         int key, res;
         while ((key = getch()) != key_escape) {
@@ -552,7 +441,7 @@ void playgame(struct map *m, struct tail **s, struct apple *a, struct bonus *b)
         }
 }
 
-void endgame(int steps, int score)
+static void endgame(int steps, int score)
 {
         int x, y;
         clear();
@@ -568,7 +457,7 @@ void endgame(int steps, int score)
         refresh();
 }
 
-int ask_continue()
+static int ask_continue()
 {
         int y, x, key, ans = 'N';
         getmaxyx(stdscr, y, x);
@@ -589,7 +478,7 @@ int ask_continue()
         return 0;
 }
 
-void freegame(struct tail *s)
+static void freegame(struct tail *s)
 {
         struct tail *t;
         while (s) {
@@ -599,17 +488,13 @@ void freegame(struct tail *s)
         }
 }
 
-int main(int argc, char **argv)
+void csnake()
 {
         struct map m;
         struct tail *s = NULL;
         struct apple a;
         struct bonus b;
-        initgettext();
-        if (!handle_opt(argv))
-                return 0;
         initcurses();
-        initcolors();
         do {
                 initgame(&m, &s, &a, &b);
                 draw_screen(m, s, a, b);
@@ -618,5 +503,4 @@ int main(int argc, char **argv)
         } while (ask_continue());
         endwin();
         freegame(s);
-        return 0;
 }
