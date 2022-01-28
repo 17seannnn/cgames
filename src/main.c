@@ -26,7 +26,7 @@ enum {
 
 const char  pn[]             = "cgames";
 const char  fn[]             = ".cgames";
-const char  mt[][mm_bufsize] = { 
+const char  mt[][mm_bufsize] = {
                                  N_("car reaction"),
                                  N_("csnake"),
                                  gettext_noop("Exit")

@@ -195,9 +195,9 @@ static void move_car(struct car *c, int dpos)
         else if (pos > max_pos)
                 pos = max_pos;
         if (c->pos < pos)
-                c->cur_x += road_width + 1; 
+                c->cur_x += road_width + 1;
         if (c->pos > pos)
-                c->cur_x -= road_width + 1; 
+                c->cur_x -= road_width + 1;
         c->pos = pos;
         show_car(*c);
 }

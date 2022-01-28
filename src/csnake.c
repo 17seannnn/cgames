@@ -124,7 +124,7 @@ static int is_bonus(int x, int y, struct bonus b)
         return 0;
 }
 
-static int has_empty(struct map m, struct tail *s, struct apple a, 
+static int has_empty(struct map m, struct tail *s, struct apple a,
                                                    struct bonus b)
 {
         int x, y;

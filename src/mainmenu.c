@@ -278,7 +278,7 @@ static void decrease_param(int n)
                         *(int *)sp[n] = imax;
         }
         save_params();
-} 
+}
 
 static void increase_param(int n)
 {
