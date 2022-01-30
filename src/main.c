@@ -159,9 +159,9 @@ int main(int argc, char **argv)
         res = handle_opt((const char **)argv);
         if (!res)
                 return 0;
-        initmm(pn, fn, mt, NULL, NULL, NULL, mc, sc, mm_colors);
         for (;;) {
                 initscr();
+                initmm(pn, fn, mt, NULL, NULL, NULL, mc, sc, mm_colors);
                 res = mainmenu();
                 endwin();
                 if (res == exit_choise)
