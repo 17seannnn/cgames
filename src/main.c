@@ -24,24 +24,20 @@ enum {
         game_csnake
 };
 
-const char  pn[]             = "cgames";
-const char  fn[]             = ".cgames";
-const char  mt[][mm_bufsize] = {
+static const char  pn[]             = "cgames";
+static const char  fn[]             = ".cgames";
+static const char  mt[][mm_bufsize] = {
                                  N_("car reaction"),
                                  N_("csnake"),
                                  gettext_noop("Exit")
 };
-const char  st[1][mm_bufsize];
-const char  sr[1][mm_bufsize];
-      void *sp[1];
-const int   mc = 3, sc = 0;
-const int   mm_colors[mm_colors_count] = {
+static const int   mc = 3, sc = 0;
+static const int   mm_colors[mm_colors_count] = {
                                  COLOR_WHITE, COLOR_BLACK, A_STANDOUT,
                                  COLOR_WHITE, COLOR_BLACK, 0,
                                  COLOR_RED, COLOR_BLACK, A_BOLD,
                                  COLOR_RED, COLOR_BLACK, 0
 };
-const int settings_menu = 0;
 
 static const char program_name[]      = N_("launcher");
 static const char program_name_long[] = N_("cgames");
@@ -163,6 +159,7 @@ int main(int argc, char **argv)
         res = handle_opt((const char **)argv);
         if (!res)
                 return 0;
+        initmm(pn, fn, mt, NULL, NULL, NULL, mc, sc, mm_colors);
         for (;;) {
                 initscr();
                 res = mainmenu();

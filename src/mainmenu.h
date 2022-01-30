@@ -10,5 +10,9 @@ enum {
 };
 
 int mainmenu();
+void initmm(const char *pn, const char *fn,
+            const char (*mt)[mm_bufsize], const char (*st)[mm_bufsize],
+            const char (*sr)[mm_bufsize], void *sp[],
+            const int mc, const int sc, const int mm_colors[mm_colors_count]);
 
 #endif
