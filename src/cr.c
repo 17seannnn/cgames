@@ -6,12 +6,46 @@
 #include <time.h>
 #include <curses.h>
 
+#include "mainmenu.h"
 #include "cgames.h"
 
 #define _(STR) gettext(STR)
 #define gettext_noop(STR) STR
 #define N_(STR) STR
 
+static int max_pos;
+
+static int min_speed;
+static int max_speed;
+
+static const char  pn[]             = "car reaction";
+static const char  fn[]             = ".cr";
+static const char  mt[][mm_bufsize] = {
+                                gettext_noop("Play game"),
+                                gettext_noop("Settings"),
+                                gettext_noop("Exit")
+};
+static const char  st[][mm_bufsize] = {
+                                gettext_noop("Barrier count"),
+/* Use max speed text on min speed variable to make more understandable */
+                                gettext_noop("Max speed"),
+                                gettext_noop("Min speed")
+};
+static const char  sr[][mm_bufsize] = {
+                                "i", "3", "1", "1", "20",
+                                "i", "50", "5", "1", "500",
+                                "i", "75", "5", "1", "500",
+};
+static       void *sp[] = {
+                                &max_pos, &min_speed, &max_speed
+};
+static const int   mc = 3, sc = 3;
+static const int   mm_colors[mm_colors_count] = {
+                                 COLOR_WHITE, COLOR_BLACK, A_STANDOUT,
+                                 COLOR_WHITE, COLOR_BLACK, 0,
+                                 COLOR_RED, COLOR_BLACK, A_BOLD,
+                                 COLOR_RED, COLOR_BLACK, 0
+};
 static const char win_text[] = gettext_noop("You win!");
 static const char continue_text[] = gettext_noop("Continue? [y/N]");
 
@@ -30,16 +64,9 @@ enum {
 
         start_pos          = 2,
         min_pos            = 1,
-        max_pos            = 3,
 
         road_height        = 16,
         road_width         = 11,
-
-        barrier_count      = max_pos,
-        barrier_width      = road_width,
-
-        min_speed          = 50,
-        max_speed          = 75,
 
         car_font_color     = COLOR_BLUE,
         car_bg_color       = COLOR_BLACK,
@@ -72,7 +99,6 @@ static void initcolors()
 
 static void initcurses()
 {
-        initscr();
         if (has_colors())
                 start_color();
         initcolors();
@@ -358,15 +384,22 @@ static int ask_continue()
 
 void cr()
 {
+        int res;
         struct map m;
         struct car c;
-        struct barrier b[barrier_count];
-        initcurses();
+        struct barrier *b = malloc(sizeof(*b) * max_pos);
+        initscr();
+        initmm(pn, fn, mt, st, sr, sp, mc, sc, mm_colors);
         do {
-                initgame(&m, &c, b, barrier_count);
-                draw_screen(m, c, b, barrier_count);
-                playgame(&m, &c, b, barrier_count);
+                res = mainmenu();
+                if (res == exit_choise)
+                        break;
+                initcurses();
+                initgame(&m, &c, b, max_pos);
+                draw_screen(m, c, b, max_pos);
+                playgame(&m, &c, b, max_pos);
                 endgame(c.score);
         } while (ask_continue());
+        free(b);
         endwin();
 }
