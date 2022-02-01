@@ -6,11 +6,49 @@
 #include <time.h>
 #include <curses.h>
 
+#include "mainmenu.h"
 #include "cgames.h"
 
 #define _(STR) gettext(STR)
 #define gettext_noop(STR) STR
 #define N_(STR) (STR)
+
+static int map_height;
+static int map_width;
+static int max_score;
+static int delay_duration;
+static int bonus_chance;
+
+static const char  pn[]             = "csnake";
+static const char  fn[]             = ".csnake";
+static const char  mt[][mm_bufsize] = {
+                                gettext_noop("Play game"),
+                                gettext_noop("Settings"),
+                                gettext_noop("Exit")
+};
+static const char  st[][mm_bufsize] = {
+                                gettext_noop("Map height"),
+                                gettext_noop("Map width"),
+                                gettext_noop("Delay duration"),
+                                gettext_noop("Bonus chance")
+};
+static const char  sr[][mm_bufsize] = {
+                                "i", "16", "1", "1", "500",
+                                "i", "50", "1", "1", "500",
+                                "i", "100", "5", "1", "500",
+                                "i", "5", "1", "1", "100"
+};
+static       void *sp[] = {
+                            &map_height, &map_width, &delay_duration,
+                            &bonus_chance
+};
+static const int   mc = 3, sc = 4;
+static const int   mm_colors[mm_colors_count] = {
+                                 COLOR_WHITE, COLOR_BLACK, A_STANDOUT,
+                                 COLOR_WHITE, COLOR_BLACK, 0,
+                                 COLOR_RED, COLOR_BLACK, A_BOLD,
+                                 COLOR_RED, COLOR_BLACK, 0
+};
 
 static const char win_text[] = gettext_noop("You win!");
 static const char continue_text[] = gettext_noop("Continue? [y/N]");
@@ -20,12 +58,6 @@ enum {
         buffer_size = 1024,
 
         key_escape = 27,
-
-        map_height = 16,
-        map_width  = 50,
-        max_score  = (map_height - 2) * (map_width - 2),
-
-        delay_duration = 100,
 
         standing_symb = '.',
         left_symb     = '<',
@@ -37,7 +69,6 @@ enum {
         apple_symb    = '@',
         bonus_symb    = '?',
 
-        bonus_chance = 5,
         bonus_end = -1,
         bonus_off = 0,
         bonus_on  = 1,
@@ -92,7 +123,6 @@ static void initcolors()
 
 static void initcurses()
 {
-        initscr();
         if (has_colors())
                 start_color();
         initcolors();
@@ -234,6 +264,7 @@ static void initgame(struct map *m, struct tail **s, struct apple *a,
         initsnake(s, *m);
         initapple(a, *s, *m);
         initbonus(b, *s, *a, *m);
+        max_score  = (map_height - 2) * (map_width - 2);
 }
 
 static void show_map(struct map m)
@@ -500,12 +531,18 @@ static void freegame(struct tail *s)
 
 void csnake()
 {
+        int res;
         struct map m;
         struct tail *s = NULL;
         struct apple a;
         struct bonus b;
-        initcurses();
+        initscr();
+        initmm(pn, fn, mt, st, sr, sp, mc, sc, mm_colors);
         do {
+                res = mainmenu();
+                if (res == exit_choise)
+                        break;
+                initcurses();
                 initgame(&m, &s, &a, &b);
                 draw_screen(m, s, a, b);
                 playgame(&m, &s, &a, &b);
