@@ -159,14 +159,14 @@ int main(int argc, char **argv)
         res = handle_opt((const char **)argv);
         if (!res)
                 return 0;
+        initscr();
         for (;;) {
-                initscr();
                 initmm(pn, fn, mt, NULL, NULL, NULL, mc, sc, mm_colors);
                 res = mainmenu();
-                endwin();
                 if (res == exit_choise)
                         break;
                 mainmenu_handle(res);
         }
+        endwin();
         return 0;
 }

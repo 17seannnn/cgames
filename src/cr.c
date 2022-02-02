@@ -389,7 +389,6 @@ void cr()
         struct map m;
         struct car c;
         struct barrier *b = malloc(sizeof(*b) * max_pos);
-        initscr();
         initmm(pn, fn, mt, st, sr, sp, mc, sc, mm_colors);
         do {
                 res = mainmenu();
@@ -402,5 +401,4 @@ void cr()
                 endgame(c.score);
         } while (ask_continue());
         free(b);
-        endwin();
 }

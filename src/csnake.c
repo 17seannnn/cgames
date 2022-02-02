@@ -536,7 +536,6 @@ void csnake()
         struct tail *s = NULL;
         struct apple a;
         struct bonus b;
-        initscr();
         initmm(pn, fn, mt, st, sr, sp, mc, sc, mm_colors);
         do {
                 res = mainmenu();
@@ -548,6 +547,5 @@ void csnake()
                 playgame(&m, &s, &a, &b);
                 endgame(s->steps, s->score);
         } while (ask_continue());
-        endwin();
         freegame(s);
 }
