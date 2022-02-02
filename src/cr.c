@@ -46,6 +46,7 @@ static const int   mm_colors[mm_colors_count] = {
                                  COLOR_RED, COLOR_BLACK, A_BOLD,
                                  COLOR_RED, COLOR_BLACK, 0
 };
+
 static const char win_text[] = gettext_noop("You win!");
 static const char continue_text[] = gettext_noop("Continue? [y/N]");
 
