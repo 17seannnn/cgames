@@ -1,4 +1,4 @@
-# Русский перевод для cgames
+# Russian translation for cgames
 # Copyright (C) 2021 Sergey Nikonov (17seannnn)
 # This file is distributed under the same license as the cgames package.
 # Sergey Nikonov (17seannnn) , 2022.
@@ -8,22 +8,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-27 12:11+0300\n"
+"POT-Creation-Date: 2022-02-02 14:04+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: main.c:32
+#: main.c:32 cr.c:26 csnake.c:27
 msgid "Exit"
 msgstr "Выйти"
 
-#: main.c:55
+#: main.c:51
 msgid "Sergey Nikonov"
 msgstr "Сергей Никонов"
 
-#: main.c:64
+#: main.c:60
 #, c-format
 msgid ""
 "Usage: %s [-OPT/--OPT]\n"
@@ -44,7 +44,7 @@ msgstr ""
 "\n"
 "Сообщить о баге & домашняя страница %s: <%s>\n"
 
-#: main.c:74
+#: main.c:70
 #, c-format
 msgid ""
 "%s (%s) %s\n"
@@ -61,15 +61,51 @@ msgstr ""
 "Написал %s (%s).\n"
 "Github: <%s>\n"
 
-#: cr.c:13 csnake.c:13
+#: cr.c:24 csnake.c:25
+msgid "Play game"
+msgstr "Играть"
+
+#: cr.c:25 csnake.c:26
+msgid "Settings"
+msgstr "Настройки"
+
+#: cr.c:29
+msgid "Barrier count"
+msgstr "Количество препятствий"
+
+#: cr.c:31
+msgid "Max speed"
+msgstr "Максимальная скорость"
+
+#: cr.c:32
+msgid "Min speed"
+msgstr "Минимальная скорость"
+
+#: cr.c:50 csnake.c:53
 msgid "You win!"
 msgstr "Вы победили"
 
-#: cr.c:14 csnake.c:14
+#: cr.c:51 csnake.c:54
 msgid "Continue? [y/N]"
 msgstr "Продолжить? [y/N]"
 
-#: csnake.c:15
+#: csnake.c:30
+msgid "Map height"
+msgstr "Высота карты"
+
+#: csnake.c:31
+msgid "Map width"
+msgstr "Ширина карты"
+
+#: csnake.c:32
+msgid "Delay duration"
+msgstr "Время задержки"
+
+#: csnake.c:33
+msgid "Bonus chance"
+msgstr "Шанс на бонус"
+
+#: csnake.c:55
 #, c-format
 msgid "Steps: %d   Score: %d"
 msgstr "Шаги: %d   Очки: %d"
